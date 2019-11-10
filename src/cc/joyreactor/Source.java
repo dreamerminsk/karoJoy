@@ -88,10 +88,11 @@ public class Source {
 
     public int insertTag(Tag tag) {
         try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO jr_tags(tag, ref, ids) VALUES(?, ?, ?)")) {
-            statement.setString(1, tag.getTag());
-            statement.setString(2, tag.getRef());
-            statement.setString(3, tag.getIds());
+                "INSERT INTO jr_tags(id, tag, ref, ids) VALUES(?, ?, ?, ?)")) {
+            statement.setInt(1, tag.getId());
+            statement.setString(2, tag.getTag());
+            statement.setString(3, tag.getRef());
+            statement.setString(4, tag.getIds());
             return statement.executeUpdate();
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);

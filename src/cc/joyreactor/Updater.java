@@ -67,8 +67,8 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     @Override
     protected UpdateStats doInBackground() {
         IntStream.range(0, 8).forEach(i -> scheduler.scheduleWithFixedDelay(this::parsePage,
-                ThreadLocalRandom.current().nextInt(0, 60),
-                ThreadLocalRandom.current().nextInt(8, 16),
+                ThreadLocalRandom.current().nextInt(0, i * 4),
+                ThreadLocalRandom.current().nextInt(8, i * 2),
                 TimeUnit.SECONDS));
         return stats;
     }
@@ -215,9 +215,10 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     private List<Tag> parseTags(Element post) {
         List<Tag> tags = new ArrayList<>();
         post.select(".taglist a[title]").forEach(tag -> {
+            String idString = tag.attr("data-ids").split(",")[0];
             Tag dbTag = source.getTag(tag.attr("title"));
             if (dbTag == null) {
-                source.insertTag(new Tag(0,
+                source.insertTag(new Tag(Integer.parseInt(idString),
                         tag.attr("title"),
                         tag.attr("abs:href"),
                         tag.attr("data-ids")));
