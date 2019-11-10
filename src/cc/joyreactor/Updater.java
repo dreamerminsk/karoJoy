@@ -5,7 +5,7 @@ import cc.joyreactor.data.Post;
 import cc.joyreactor.data.Tag;
 import cc.joyreactor.data.User;
 import cc.joyreactor.models.UpdateStats;
-import ch.caro62.services.Http;
+import ch.caro62.services.WebClient;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.jsoup.nodes.Element;
@@ -83,7 +83,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
                 Thread.currentThread().getName() + " - " +
                         start.format(LOCAL_TIME) + " - " +
                         tagRef.getKey() + " - " + getPageNum(tagRef.getValue()));
-        Http.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
+        WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
             System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getKey() + "' : " + tagRef);
             doc.select("div.postContainer").stream().map(this::parsePost)
                     .forEachOrdered(this::update);
@@ -171,7 +171,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
                 .flatMap(user -> user.select(".avatar").stream()
                         .map(av -> {
                             System.out.println(av.attr("abs:src"));
-                            byte[] avatar = Http.getBytesSync(av.attr("abs:src")).get();
+                            byte[] avatar = WebClient.getBytesSync(av.attr("abs:src")).get();
                             User dbUser = source.getUser(user.text());
                             if (dbUser == null) {
                                 System.out.println("\t\t\tNEW USERS: " + stats.incUsers());

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author karo62
  */
-public class Http {
+public class WebClient {
 
     private static final Random RND = new Random();
 
