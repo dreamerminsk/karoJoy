@@ -67,8 +67,8 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     @Override
     protected UpdateStats doInBackground() {
         IntStream.range(0, 8).forEach(i -> scheduler.scheduleWithFixedDelay(this::parsePage,
-                ThreadLocalRandom.current().nextInt(0, i * 4),
-                ThreadLocalRandom.current().nextInt(8, i * 2),
+                8 * i,
+                ThreadLocalRandom.current().nextInt(8, 16),
                 TimeUnit.SECONDS));
         return stats;
     }
@@ -96,7 +96,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         stats.addThread(
                 getThreadNum(Thread.currentThread().getName()),
                 Thread.currentThread().getName() + " - " +
-                        finish.format(LOCAL_TIME) + " - " + timer.getSnapshot().getMedian() / 1000000000);
+                        finish.format(LOCAL_TIME) + " - " + timer.getMeanRate() + " / " + timer.getCount());
     }
 
     private String getPageNum(String value) {
