@@ -1,10 +1,13 @@
 package cc.joyreactor;
 
+import cc.joyreactor.models.PostsModel;
 import cc.joyreactor.models.UpdateStats;
+import cc.joyreactor.views.PostsView;
 import cc.joyreactor.views.UpdaterView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class JRViewer extends JFrame {
@@ -15,7 +18,7 @@ public class JRViewer extends JFrame {
 
     private final UpdateStats stats = new UpdateStats();
 
-    private JRViewer() throws SQLException {
+    private JRViewer() throws SQLException, IOException {
         super(TITLE + " " + VERSION);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         setSize(new Dimension(screen.width * 9 / 10, screen.height * 9 / 10));
@@ -26,7 +29,7 @@ public class JRViewer extends JFrame {
         setVisible(true);
     }
 
-    public static void main(String... args) throws SQLException {
+    public static void main(String... args) throws SQLException, IOException {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
@@ -37,8 +40,8 @@ public class JRViewer extends JFrame {
         updater.execute();
     }
 
-    private void setupUi() throws SQLException {
-        //add(new PostsView(new PostsModel()), BorderLayout.CENTER);
+    private void setupUi() throws SQLException, IOException {
+        add(new PostsView(new PostsModel()), BorderLayout.CENTER);
         add(new JScrollPane(new UpdaterView(stats)), BorderLayout.PAGE_END);
     }
 

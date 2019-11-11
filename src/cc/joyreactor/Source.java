@@ -220,20 +220,39 @@ public class Source {
         String sql = "SELECT * FROM jr_posts WHERE post_id=?;";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, name);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    Post post = new Post();
-                    post.setId(rs.getInt(1));
-                    post.setUser(getUser(rs.getString(2)));
-                    post.setPublished(ZonedDateTime.parse(rs.getString(3), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-                    post.setComments(rs.getInt(4));
-                    post.setRating(rs.getBigDecimal(5));
-                    return post;
-                }
-            }
+            Post post = recordToPost(statement);
+            if (post != null) return post;
         } catch (SQLException e) {
             JXErrorPane.showDialog(e);
             return null;
+        }
+        return null;
+    }
+
+    public Post getLatestPost(ZonedDateTime sinse) {
+        String sql = "SELECT * FROM jr_posts WHERE published<? ORDER BY published DESC LIMIT 1;";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, sinse.toString());
+            Post post = recordToPost(statement);
+            if (post != null) return post;
+        } catch (SQLException e) {
+            JXErrorPane.showDialog(e);
+            return null;
+        }
+        return null;
+    }
+
+    private Post recordToPost(PreparedStatement statement) throws SQLException {
+        try (ResultSet rs = statement.executeQuery()) {
+            if (rs.next()) {
+                Post post = new Post();
+                post.setId(rs.getInt(1));
+                post.setUser(getUser(rs.getString(2)));
+                post.setPublished(ZonedDateTime.parse(rs.getString(3), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+                post.setComments(rs.getInt(4));
+                post.setRating(rs.getBigDecimal(5));
+                return post;
+            }
         }
         return null;
     }

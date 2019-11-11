@@ -96,7 +96,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         stats.addThread(
                 getThreadNum(Thread.currentThread().getName()),
                 Thread.currentThread().getName() + " - " +
-                        finish.format(LOCAL_TIME) + " - " + timer.getMeanRate() + " / " + timer.getCount());
+                        finish.format(LOCAL_TIME) + " - " + (3600 * timer.getMeanRate()) + " / " + timer.getCount());
     }
 
     private String getPageNum(String value) {
@@ -171,10 +171,10 @@ public class Updater extends SwingWorker<UpdateStats, String> {
                 .flatMap(user -> user.select(".avatar").stream()
                         .map(av -> {
                             System.out.println(av.attr("abs:src"));
-                            byte[] avatar = WebClient.getBytesSync(av.attr("abs:src")).get();
                             User dbUser = source.getUser(user.text());
                             if (dbUser == null) {
                                 System.out.println("\t\t\tNEW USERS: " + stats.incUsers());
+                                byte[] avatar = WebClient.getBytesSync(av.attr("abs:src")).get();
                                 User u = new User(0, user.text(), avatar);
                                 source.insertUser(u);
                                 return u;
