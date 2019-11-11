@@ -27,6 +27,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private Source source;
     private JLabel ratingLabel;
     private BufferedImage defaultPic;
+    private JPanel tagsPanel;
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -45,15 +46,28 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     }
 
     private JComponent getPostView() {
-        JPanel comp = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel comp = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
 
         userLabel = new JLabel();
-        userLabel.setFont(userLabel.getFont().deriveFont(Font.BOLD | Font.ITALIC, 16.0f));
-        comp.add(userLabel);
+        userLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
+        userLabel.setFont(userLabel.getFont().deriveFont(Font.PLAIN, 24.0f));
+        c.gridx = 0;
+        c.gridy = 0;
+        c.insets = new Insets(5, 5, 5, 5);
+        //c.weighty = 1.0;
+        c.anchor = GridBagConstraints.FIRST_LINE_START;
+        comp.add(userLabel, c);
 
         ratingLabel = new JLabel();
         ratingLabel.setFont(ratingLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
-        comp.add(ratingLabel);
+        c.gridx = 1;
+        c.gridy = 0;
+        c.insets = new Insets(5, 5, 5, 5);
+        //c.weighty = 1.0;
+        c.weightx = 1.0;
+        c.anchor = GridBagConstraints.FIRST_LINE_END;
+        comp.add(ratingLabel, c);
 
         JButton nextButton = new JButton("next >>");
         nextButton.addActionListener(e -> {
@@ -67,13 +81,31 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                         SwingUtilities.invokeLater(this::update);
                     });
         });
-        comp.add(nextButton);
+        c.gridx = 2;
+        c.gridy = 0;
+        c.insets = new Insets(5, 5, 5, 5);
+        //c.weighty = 1.0;
+        //c.weightx = 1.0;
+        c.anchor = GridBagConstraints.FIRST_LINE_END;
+        comp.add(nextButton, c);
+
+
+        tagsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 3;
+        c.insets = new Insets(5, 5, 5, 5);
+        c.weighty = 1.0;
+        //c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        comp.add(tagsPanel, c);
 
         return comp;
     }
 
     private void update() {
-        userLabel.setText("[" + current.getUser().getName() + "]");
+        userLabel.setText(current.getUser().getName() + " ");
         CompletableFuture.supplyAsync(() -> {
             try {
                 return ImageIO.read(new ByteArrayInputStream(current.getUser().getAvatar()));
@@ -82,7 +114,20 @@ public class PostsView extends JPanel implements PropertyChangeListener {
             }
         }).thenAcceptAsync(img -> userLabel.setIcon(new ImageIcon(img)));
 
-        ratingLabel.setText(current.getRating().toString());
+        ratingLabel.setText(current.getRating().toString() + " ");
+
+        CompletableFuture.supplyAsync(() -> source.getPostTags(current.getId()))
+                .thenAcceptAsync(tags -> {
+                    SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
+                    SwingUtilities.invokeLater(() -> tagsPanel.add(new JLabel("LOADING...")));
+                    tags.stream().map(tag -> {
+                        JLabel tagLabel = new JLabel(" " + tag.getTag() + " ");
+                        tagLabel.setFont(tagLabel.getFont().deriveFont(Font.ITALIC, 12.0f));
+                        tagLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
+                        return tagLabel;
+                    }).peek((tl) -> SwingUtilities.invokeLater(() -> tagsPanel.removeAll()))
+                            .forEach(tl -> SwingUtilities.invokeLater(() -> tagsPanel.add(tl)));
+                });
     }
 
     private JComponent getSearchView() {
