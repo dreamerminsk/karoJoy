@@ -218,7 +218,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
             String idString = tag.attr("data-ids").split(",")[0];
             Tag dbTag = source.getTag(tag.attr("title"));
             if (dbTag == null) {
-                source.insertTag(new Tag(Integer.parseInt(idString),
+                source.insertTag(new Tag(0,
                         tag.attr("title"),
                         tag.attr("abs:href"),
                         tag.attr("data-ids")));
