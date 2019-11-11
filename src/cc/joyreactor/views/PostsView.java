@@ -66,7 +66,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         c.insets = new Insets(5, 5, 5, 5);
         //c.weighty = 1.0;
         c.weightx = 1.0;
-        c.anchor = GridBagConstraints.FIRST_LINE_END;
+        c.anchor = GridBagConstraints.EAST;
         comp.add(ratingLabel, c);
 
         JButton nextButton = new JButton("next >>");
@@ -85,7 +85,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
         //c.weighty = 1.0;
-        //c.weightx = 1.0;
+        c.weightx = 0.0;
         c.anchor = GridBagConstraints.FIRST_LINE_END;
         comp.add(nextButton, c);
 
@@ -119,14 +119,12 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         CompletableFuture.supplyAsync(() -> source.getPostTags(current.getId()))
                 .thenAcceptAsync(tags -> {
                     SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
-                    SwingUtilities.invokeLater(() -> tagsPanel.add(new JLabel("LOADING...")));
                     tags.stream().map(tag -> {
                         JLabel tagLabel = new JLabel(" " + tag.getTag() + " ");
-                        tagLabel.setFont(tagLabel.getFont().deriveFont(Font.ITALIC, 12.0f));
+                        tagLabel.setFont(tagLabel.getFont().deriveFont(Font.ITALIC, 14.0f));
                         tagLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
                         return tagLabel;
-                    }).peek((tl) -> SwingUtilities.invokeLater(() -> tagsPanel.removeAll()))
-                            .forEach(tl -> SwingUtilities.invokeLater(() -> tagsPanel.add(tl)));
+                    }).forEach(tl -> SwingUtilities.invokeLater(() -> tagsPanel.add(tl)));
                 });
     }
 
