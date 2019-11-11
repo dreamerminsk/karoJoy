@@ -53,6 +53,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         GridBagConstraints c = new GridBagConstraints();
 
         userLabel = new JLabel();
+        userLabel.setMinimumSize(new Dimension(50, 200));
         userLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
         userLabel.setFont(userLabel.getFont().deriveFont(Font.PLAIN, 32.0f));
         c.gridx = 0;
@@ -120,7 +121,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
     private void update() {
         userLabel.setText(current.getUser().getName() + " ");
-        userLabel.setIcon(new ImageIcon(defaultPic));
+        //userLabel.setIcon(new ImageIcon(defaultPic));
         pubLabel.setText(current.getPublished().format(DateTimeFormatter.ofPattern("d MMM uuuu HH:MM:ss")) + " ");
         ratingLabel.setText(current.getRating().toString() + " ");
         SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
