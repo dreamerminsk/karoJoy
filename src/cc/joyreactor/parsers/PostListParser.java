@@ -71,26 +71,6 @@ public class PostListParser {
         return 0;
     }
 
-    public static void update(Post post) {
-        Post dbPost = source.getPost(post.getId());
-        if (dbPost == null || dbPost.getPublished() == null) {
-            System.out.println("\t\t\tNEW POSTS: " + stats.incPosts());
-            System.out.println("\t\t\tNEW COMMENTS: " + stats.addComments(post.getComments()));
-            System.out.println("\t\t\tNEW RATING: " + stats.addRating(post.getRating()));
-            source.insertPost(post);
-        } else {
-            System.out.println("\t\t\tNEW COMMENTS: " + stats.addComments(post.getComments() - dbPost.getComments()));
-            System.out.println("\t\t\tNEW RATING: " + stats.addRating(post.getRating().subtract(dbPost.getRating())));
-            source.updatePost(post);
-        }
-        if (source.getPostTags(post.getId()).size() == 0) {
-            source.setPostTags(post.getId(), post.getTags());
-        }
-        if (source.getPostImages(post.getId()).size() == 0) {
-            source.setPostImages(post.getId(), post.getImages());
-        }
-    }
-
     public static Post parsePost(Element post) {
         Post postItem = new Post();
         postItem.setId(parsePostId(post));
@@ -125,17 +105,9 @@ public class PostListParser {
         return post.select("div.uhead_nick").stream()
                 .flatMap(user -> user.select(".avatar").stream()
                         .map(av -> {
-                            System.out.println(av.attr("abs:src"));
-                            User dbUser = source.getUser(user.text());
-                            if (dbUser == null) {
-                                System.out.println("\t\t\tNEW USERS: " + stats.incUsers());
                                 byte[] avatar = WebClient.getBytesSync(av.attr("abs:src")).get();
                                 User u = new User(0, user.text(), avatar);
-                                source.insertUser(u);
                                 return u;
-                            } else {
-                                return dbUser;
-                            }
                         })
                 ).findFirst().orElse(null);
     }
