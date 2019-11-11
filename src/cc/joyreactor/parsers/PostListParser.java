@@ -29,7 +29,7 @@ import java.util.stream.IntStream;
 
 import static java.time.temporal.ChronoField.*;
 
-public class Updater extends SwingWorker<UpdateStats, String> {
+public class PostListParser {
 
     private final static DateTimeFormatter LOCAL_TIME = new DateTimeFormatterBuilder()
             .appendValue(HOUR_OF_DAY, 2)
@@ -39,39 +39,6 @@ public class Updater extends SwingWorker<UpdateStats, String> {
             .appendLiteral(':')
             .appendValue(SECOND_OF_MINUTE, 2)
             .toFormatter();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(8);
-    private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>();
-    private final Source source;
-    private final UpdateStats stats;
-    private MetricRegistry metricRegistry = new MetricRegistry();
-
-    public Updater(UpdateStats stats) throws SQLException {
-        this.stats = stats;
-        source = Source.getInstance();
-        urlMap.put("JoyReactor", "http://joyreactor.cc/best");
-        urlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
-        urlMap.put("Anime", "http://anime.reactor.cc/new");
-        urlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
-        List<Tag> tags = source.getTags();
-        Collections.shuffle(tags, ThreadLocalRandom.current());
-
-        tags.stream().limit(16).forEachOrdered(tag -> {
-            if (tag.getRef().endsWith("/")) {
-                urlMap.put(tag.getTag(), tag.getRef() + "new");
-            } else {
-                urlMap.put(tag.getTag(), tag.getRef() + "/new");
-            }
-        });
-    }
-
-    @Override
-    protected UpdateStats doInBackground() {
-        IntStream.range(0, 8).forEach(i -> scheduler.scheduleWithFixedDelay(this::parsePage,
-                8 * i,
-                ThreadLocalRandom.current().nextInt(8, 16),
-                TimeUnit.SECONDS));
-        return stats;
-    }
 
     private void parsePage() {
         Map.Entry<String, String> tagRef = urlMap.pollFirstEntry();
@@ -204,7 +171,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
                 .map(BigDecimal::new).findFirst().orElse(new BigDecimal(0.0d));
     }
 
-    private Integer parsePostId(Element post) {
+    public static Integer parsePostId(Element post) {
         return post.select(".ufoot .link_wr a.link").stream()
                 .map(user -> user.attr("href"))
                 .map(id -> id.replace("/post/", ""))
