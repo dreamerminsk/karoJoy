@@ -40,34 +40,14 @@ public class PostListParser {
             .appendValue(SECOND_OF_MINUTE, 2)
             .toFormatter();
 
-    private void parsePage() {
-        Map.Entry<String, String> tagRef = urlMap.pollFirstEntry();
-        LocalTime start = LocalTime.now();
-        Timer timer = metricRegistry.timer(Thread.currentThread().getName());
-        Timer.Context context = timer.time();
-        stats.addThread(
-                getThreadNum(Thread.currentThread().getName()),
-                Thread.currentThread().getName() + " - " +
-                        start.format(LOCAL_TIME) + " - " +
-                        tagRef.getKey() + " - " + getPageNum(tagRef.getValue()));
-        WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
-            System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getKey() + "' : " + tagRef);
-            doc.select("a.next").forEach(next -> System.out.println("\t\t\tNEXT: " + next.attr("abs:href")));
+    public static void parsePage() {
             doc.select("a.next").forEach(next -> urlMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
 
             doc.select("div.postContainer").stream().map(this::parsePost)
                     .forEachOrdered(this::update);
-            //urlMap.put(tag, null);
-        });
-        context.stop();
-        LocalTime finish = LocalTime.now();
-        stats.addThread(
-                getThreadNum(Thread.currentThread().getName()),
-                Thread.currentThread().getName() + " - " +
-                        finish.format(LOCAL_TIME) + " - " + (3600 * timer.getMeanRate()) + " / " + timer.getCount());
     }
 
-    private String getPageNum(String value) {
+    public static String getPageNum(String value) {
         String[] parts = value.split("/");
         if (parts.length > 0) {
             try {
@@ -79,7 +59,7 @@ public class PostListParser {
         return "---";
     }
 
-    private int getThreadNum(String name) {
+    public static int getThreadNum(String name) {
         String[] parts = name.split("-");
         if (parts.length > 0) {
             try {
@@ -91,7 +71,7 @@ public class PostListParser {
         return 0;
     }
 
-    private void update(Post post) {
+    public static void update(Post post) {
         Post dbPost = source.getPost(post.getId());
         if (dbPost == null || dbPost.getPublished() == null) {
             System.out.println("\t\t\tNEW POSTS: " + stats.incPosts());
@@ -111,7 +91,7 @@ public class PostListParser {
         }
     }
 
-    private Post parsePost(Element post) {
+    public static Post parsePost(Element post) {
         Post postItem = new Post();
         postItem.setId(parsePostId(post));
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + postItem.getId());
@@ -133,7 +113,7 @@ public class PostListParser {
         return postItem;
     }
 
-    private List<Image> parseImages(Element post) {
+    public static List<Image> parseImages(Element post) {
         return post.select("div.post_content div.image img[src]").stream().map(tag -> new Image(
                 Integer.parseInt("0" + tag.attr("width")),
                 Integer.parseInt("0" + tag.attr("height")),
@@ -141,7 +121,7 @@ public class PostListParser {
         )).collect(Collectors.toList());
     }
 
-    private User parseUser(Element post) {
+    public static User parseUser(Element post) {
         return post.select("div.uhead_nick").stream()
                 .flatMap(user -> user.select(".avatar").stream()
                         .map(av -> {
@@ -160,13 +140,13 @@ public class PostListParser {
                 ).findFirst().orElse(null);
     }
 
-    private ZonedDateTime parsePublished(Element post) {
+    public static ZonedDateTime parsePublished(Element post) {
         return post.select("span.date span[data-time]").stream()
                 .map(user -> Instant.ofEpochMilli(1000 * Long.parseLong(user.attr("data-time")))
                         .atZone(ZoneId.of("Europe/Moscow"))).findFirst().orElse(null);
     }
 
-    private BigDecimal parseRating(Element post) {
+    public static BigDecimal parseRating(Element post) {
         return post.select(".ufoot .post_rating").stream().map(Element::text)
                 .map(BigDecimal::new).findFirst().orElse(new BigDecimal(0.0d));
     }
@@ -179,7 +159,7 @@ public class PostListParser {
 
     }
 
-    private Integer parseComments(Element post) {
+    public static Integer parseComments(Element post) {
         return post.select(".commentnum").stream()
                 .map(Element::text)
                 .map(text -> text.replace("Комментарии ", "0"))
@@ -187,22 +167,16 @@ public class PostListParser {
 
     }
 
-    private List<Tag> parseTags(Element post) {
+    public static List<Tag> parseTags(Element post) {
         List<Tag> tags = new ArrayList<>();
-        post.select(".taglist a[title]").forEach(tag -> {
+        post.select(".taglist a[title]").forEach(tagItem -> {
             String idString = tag.attr("data-ids").split(",")[0];
-            Tag dbTag = source.getTag(tag.attr("title"));
-            if (dbTag == null) {
-                source.insertTag(new Tag(0,
-                        tag.attr("title"),
-                        tag.attr("abs:href"),
-                        tag.attr("data-ids")));
-                tags.add(source.getTag(tag.attr("title")));
-            } else {
-                tags.add(dbTag);
-            }
+            new Tag(0,
+                        tagItem.attr("title"),
+                        tagItem.attr("abs:href"),
+                        tagItem.attr("data-ids")));
+                tags.add(tag);
         });
-
         return tags;
     }
 
