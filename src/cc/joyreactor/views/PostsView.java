@@ -28,6 +28,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private JLabel ratingLabel;
     private BufferedImage defaultPic;
     private JPanel tagsPanel;
+    private JLabel loadingLabel = new JLabel(" LOADING... ");
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -51,7 +52,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
         userLabel = new JLabel();
         userLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
-        userLabel.setFont(userLabel.getFont().deriveFont(Font.PLAIN, 24.0f));
+        userLabel.setFont(userLabel.getFont().deriveFont(Font.PLAIN, 32.0f));
         c.gridx = 0;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
@@ -70,15 +71,18 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         comp.add(ratingLabel, c);
 
         JButton nextButton = new JButton("next >>");
+        nextButton.setFont(nextButton.getFont().deriveFont(Font.ITALIC, 32.0f));
         nextButton.addActionListener(e -> {
             nextButton.setText("loading...");
             nextButton.setEnabled(false);
             CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished()))
                     .thenAcceptAsync((p) -> {
                         current = p;
-                        nextButton.setText("next >>");
-                        nextButton.setEnabled(true);
                         SwingUtilities.invokeLater(this::update);
+                        SwingUtilities.invokeLater(() -> {
+                            nextButton.setText("next >>");
+                            nextButton.setEnabled(true);
+                        });
                     });
         });
         c.gridx = 2;
@@ -106,6 +110,12 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
     private void update() {
         userLabel.setText(current.getUser().getName() + " ");
+        userLabel.setIcon(new ImageIcon(defaultPic));
+        ratingLabel.setText(current.getRating().toString() + " ");
+        SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
+        SwingUtilities.invokeLater(() -> loadingLabel.setVisible(true));
+        SwingUtilities.invokeLater(() -> tagsPanel.add(loadingLabel));
+
         CompletableFuture.supplyAsync(() -> {
             try {
                 return ImageIO.read(new ByteArrayInputStream(current.getUser().getAvatar()));
@@ -114,17 +124,16 @@ public class PostsView extends JPanel implements PropertyChangeListener {
             }
         }).thenAcceptAsync(img -> userLabel.setIcon(new ImageIcon(img)));
 
-        ratingLabel.setText(current.getRating().toString() + " ");
-
         CompletableFuture.supplyAsync(() -> source.getPostTags(current.getId()))
                 .thenAcceptAsync(tags -> {
                     SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
                     tags.stream().map(tag -> {
                         JLabel tagLabel = new JLabel(" " + tag.getTag() + " ");
-                        tagLabel.setFont(tagLabel.getFont().deriveFont(Font.ITALIC, 14.0f));
+                        tagLabel.setFont(tagLabel.getFont().deriveFont(Font.ITALIC, 16.0f));
                         tagLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
                         return tagLabel;
                     }).forEach(tl -> SwingUtilities.invokeLater(() -> tagsPanel.add(tl)));
+                    SwingUtilities.invokeLater(() -> loadingLabel.setVisible(false));
                 });
     }
 
