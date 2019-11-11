@@ -11,7 +11,6 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,14 +31,6 @@ public class WebClient {
 
     private static CallbackFuture getRequest(Request req) {
         acquire(req.url().host(), 1600 + RND.nextInt(800));
-        CallbackFuture result = new CallbackFuture();
-        CLIENT.newCall(req).enqueue(result);
-        return result;
-    }
-
-    public static CompletableFuture<Optional<Response>> getTask(String ref) {
-        Request req = createGetRequest(ref);
-        acquire(req.url().host(), 1000 + RND.nextInt(1000));
         CallbackFuture result = new CallbackFuture();
         CLIENT.newCall(req).enqueue(result);
         return result;
@@ -72,21 +63,6 @@ public class WebClient {
             LIMITERS.put(host, RateLimiter.create(1000));
         }
         LIMITERS.get(host).acquire(permits);
-    }
-
-    public static CompletableFuture<Optional<Object>> getDocument(String ref) {
-        Request req = createGetRequest(ref);
-        CallbackFuture f = getRequest(req);
-        return f.handleAsync((t, u) -> t.map(d -> {
-            if (null != d.body()) {
-                try {
-                    return Jsoup.parse(Objects.requireNonNull(d.body()).string(), req.url().host());
-                } catch (IOException ex) {
-                    //return Optional.empty();
-                }
-            }
-            return Optional.empty();
-        }));
     }
 
     private static Request createGetRequest(String ref) {
