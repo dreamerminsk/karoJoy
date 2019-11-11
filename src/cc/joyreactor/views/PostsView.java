@@ -16,6 +16,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
 
 public class PostsView extends JPanel implements PropertyChangeListener {
@@ -29,6 +30,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private BufferedImage defaultPic;
     private JPanel tagsPanel;
     private JLabel loadingLabel = new JLabel(" LOADING... ");
+    private JLabel pubLabel;
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -60,9 +62,19 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         c.anchor = GridBagConstraints.FIRST_LINE_START;
         comp.add(userLabel, c);
 
+        pubLabel = new JLabel();
+        pubLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
+        pubLabel.setFont(pubLabel.getFont().deriveFont(Font.PLAIN, 24.0f));
+        c.gridx = 1;
+        c.gridy = 0;
+        c.insets = new Insets(5, 5, 5, 5);
+        //c.weighty = 1.0;
+        c.anchor = GridBagConstraints.FIRST_LINE_START;
+        comp.add(pubLabel, c);
+
         ratingLabel = new JLabel();
         ratingLabel.setFont(ratingLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
-        c.gridx = 1;
+        c.gridx = 2;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
         //c.weighty = 1.0;
@@ -70,7 +82,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         c.anchor = GridBagConstraints.EAST;
         comp.add(ratingLabel, c);
 
-        JButton nextButton = new JButton("next >>");
+        JButton nextButton = new JButton("next  >>");
         nextButton.setFont(nextButton.getFont().deriveFont(Font.ITALIC, 32.0f));
         nextButton.addActionListener(e -> {
             nextButton.setText("loading...");
@@ -80,12 +92,12 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                         current = p;
                         SwingUtilities.invokeLater(this::update);
                         SwingUtilities.invokeLater(() -> {
-                            nextButton.setText("next >>");
+                            nextButton.setText("next  >>");
                             nextButton.setEnabled(true);
                         });
                     });
         });
-        c.gridx = 2;
+        c.gridx = 3;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
         //c.weighty = 1.0;
@@ -98,7 +110,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
         c.gridx = 0;
         c.gridy = 1;
-        c.gridwidth = 3;
+        c.gridwidth = 4;
         c.insets = new Insets(5, 5, 5, 5);
         c.weighty = 1.0;
         //c.weightx = 1.0;
@@ -111,10 +123,11 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private void update() {
         userLabel.setText(current.getUser().getName() + " ");
         userLabel.setIcon(new ImageIcon(defaultPic));
+        pubLabel.setText(current.getPublished().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         ratingLabel.setText(current.getRating().toString() + " ");
         SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
-        SwingUtilities.invokeLater(() -> loadingLabel.setVisible(true));
-        SwingUtilities.invokeLater(() -> tagsPanel.add(loadingLabel));
+        //SwingUtilities.invokeLater(() -> loadingLabel.setVisible(true));
+        //SwingUtilities.invokeLater(() -> tagsPanel.add(loadingLabel));
 
         CompletableFuture.supplyAsync(() -> {
             try {
@@ -127,13 +140,16 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         CompletableFuture.supplyAsync(() -> source.getPostTags(current.getId()))
                 .thenAcceptAsync(tags -> {
                     SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
-                    tags.stream().map(tag -> {
+                    tags.stream().sequential().map(tag -> {
                         JLabel tagLabel = new JLabel(" " + tag.getTag() + " ");
                         tagLabel.setFont(tagLabel.getFont().deriveFont(Font.ITALIC, 16.0f));
                         tagLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
                         return tagLabel;
-                    }).forEach(tl -> SwingUtilities.invokeLater(() -> tagsPanel.add(tl)));
-                    SwingUtilities.invokeLater(() -> loadingLabel.setVisible(false));
+                    }).forEach(tl -> SwingUtilities.invokeLater(() -> {
+                        tagsPanel.add(tl);
+                        tagsPanel.revalidate();
+                        tagsPanel.repaint();
+                    }));
                 });
     }
 
