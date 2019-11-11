@@ -55,7 +55,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
-        tags.stream().limit(4).forEachOrdered(tag -> {
+        tags.stream().limit(16).forEachOrdered(tag -> {
             if (tag.getRef().endsWith("/")) {
                 urlMap.put(tag.getTag(), tag.getRef() + "new");
             } else {
@@ -85,11 +85,12 @@ public class Updater extends SwingWorker<UpdateStats, String> {
                         tagRef.getKey() + " - " + getPageNum(tagRef.getValue()));
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
             System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getKey() + "' : " + tagRef);
+            doc.select("a.next").forEach(next -> System.out.println("\t\t\tNEXT: " + next.attr("abs:href")));
+            doc.select("a.next").forEach(next -> urlMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
+
             doc.select("div.postContainer").stream().map(this::parsePost)
                     .forEachOrdered(this::update);
             //urlMap.put(tag, null);
-            doc.select("a.next").forEach(next -> System.out.println("\t\t\tNEXT: " + next.attr("abs:href")));
-            doc.select("a.next").forEach(next -> urlMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
         });
         context.stop();
         LocalTime finish = LocalTime.now();
@@ -125,7 +126,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
     private void update(Post post) {
         Post dbPost = source.getPost(post.getId());
-        if (dbPost == null) {
+        if (dbPost == null || dbPost.getPublished() == null) {
             System.out.println("\t\t\tNEW POSTS: " + stats.incPosts());
             System.out.println("\t\t\tNEW COMMENTS: " + stats.addComments(post.getComments()));
             System.out.println("\t\t\tNEW RATING: " + stats.addRating(post.getRating()));
@@ -146,15 +147,22 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     private Post parsePost(Element post) {
         Post postItem = new Post();
         postItem.setId(parsePostId(post));
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + postItem.getId());
         postItem.setUser(parseUser(post));
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + postItem.getUser().getName());
         postItem.setTags(parseTags(post));
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + postItem.getTags());
         postItem.setImages(parseImages(post));
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + postItem.getImages());
         postItem.setComments(parseComments(post));
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + postItem.getComments());
         postItem.setRating(parseRating(post));
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + postItem.getRating());
         postItem.setPublished(parsePublished(post));
-        System.out.println(postItem.getId() + " " + postItem.getTags());
-        System.out.println("\t" + postItem.getUser().getName() + " " + postItem.getPublished());
-        System.out.println("\t" + postItem.getImages().size() + ", " + postItem.getComments() + ", " + postItem.getRating());
+        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + postItem.getPublished());
+        //System.out.println(postItem.getId() + " " + postItem.getTags());
+        //System.out.println("\t" + postItem.getUser().getName() + " " + postItem.getPublished());
+        //System.out.println("\t" + postItem.getImages().size() + ", " + postItem.getComments() + ", " + postItem.getRating());
         return postItem;
     }
 

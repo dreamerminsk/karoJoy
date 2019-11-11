@@ -23,9 +23,9 @@ public class WebClient {
     private static final Map<String, RateLimiter> LIMITERS = new TreeMap<>();
 
     private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
-            .callTimeout(16, TimeUnit.SECONDS)
-            .connectTimeout(16, TimeUnit.SECONDS)
-            .readTimeout(16, TimeUnit.SECONDS)
+            .callTimeout(32, TimeUnit.SECONDS)
+            .connectTimeout(32, TimeUnit.SECONDS)
+            .readTimeout(32, TimeUnit.SECONDS)
             .build();
     private static final String USER_AGENT = "User-Agent";
 
@@ -38,7 +38,7 @@ public class WebClient {
 
     public static Optional<Document> getDocSync(String ref) {
         Request req = createGetRequest(ref);
-        acquire(req.url().host(), 1000 + RND.nextInt(400));
+        acquire(req.url().host(), 4000 + RND.nextInt(8000));
         try (Response response = CLIENT.newCall(req).execute()) {
             return Optional.ofNullable(Jsoup.parse(Objects.requireNonNull(response.body()).string(),
                     req.url().scheme() + "://" + req.url().host()));

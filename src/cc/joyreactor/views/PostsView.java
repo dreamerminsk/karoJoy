@@ -42,7 +42,9 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         source = Source.getInstance();
         current = source.getLatestPost(Instant.now().atZone(ZoneId.of("Europe/Moscow")));
         ui();
-        update();
+        if (current != null) {
+            update();
+        }
     }
 
     private void ui() throws IOException {
@@ -56,36 +58,82 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         GridBagConstraints c = new GridBagConstraints();
 
         userLabel = new JLabel();
-        userLabel.setFont(userLabel.getFont().deriveFont(Font.PLAIN, 30.0f));
+        userLabel.setFont(new Font("Monospace", Font.PLAIN, 28));
         c.gridx = 0;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
         c.anchor = GridBagConstraints.FIRST_LINE_START;
         comp.add(userLabel, c);
 
-        JButton jbNext = new JButton(">>");
-        JButton jbPrev = new JButton("<<");
-        jbNext.setFont(jbNext.getFont().deriveFont(Font.ITALIC, 12.0f));
+
+        JButton jbNext = new JButton(">");
+        JButton jbPrev = new JButton("<");
+        JButton jbNext10 = new JButton(">>");
+        JButton jbPrev10 = new JButton("<<");
+        jbNext10.setFont(jbNext10.getFont().deriveFont(Font.ITALIC, 8.0f));
+        jbNext10.addActionListener(e -> {
+            jbPrev10.setEnabled(false);
+            jbNext10.setEnabled(false);
+            jbPrev.setEnabled(false);
+            jbNext.setEnabled(false);
+            CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished(), 10))
+                    .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
+                        current = p;
+                        update();
+                        jbPrev10.setEnabled(true);
+                        jbNext10.setEnabled(true);
+                        jbPrev.setEnabled(true);
+                        jbNext.setEnabled(true);
+                    }));
+        });
+
+        jbPrev10.setFont(jbPrev10.getFont().deriveFont(Font.ITALIC, 8.0f));
+        jbPrev10.addActionListener(e -> {
+            jbPrev10.setEnabled(false);
+            jbNext10.setEnabled(false);
+            jbPrev.setEnabled(false);
+            jbNext.setEnabled(false);
+            CompletableFuture.supplyAsync(() -> source.getPrevLatestPost(current.getPublished(), 10))
+                    .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
+                        current = p;
+                        update();
+                        jbPrev10.setEnabled(true);
+                        jbNext10.setEnabled(true);
+                        jbPrev.setEnabled(true);
+                        jbNext.setEnabled(true);
+                    }));
+        });
+
+
+        jbNext.setFont(jbNext.getFont().deriveFont(Font.ITALIC, 8.0f));
         jbNext.addActionListener(e -> {
+            jbPrev10.setEnabled(false);
+            jbNext10.setEnabled(false);
             jbPrev.setEnabled(false);
             jbNext.setEnabled(false);
             CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished()))
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
+                        jbPrev10.setEnabled(true);
+                        jbNext10.setEnabled(true);
                         jbPrev.setEnabled(true);
                         jbNext.setEnabled(true);
                     }));
         });
 
-        jbPrev.setFont(jbPrev.getFont().deriveFont(Font.ITALIC, 12.0f));
+        jbPrev.setFont(jbPrev.getFont().deriveFont(Font.ITALIC, 8.0f));
         jbPrev.addActionListener(e -> {
+            jbPrev10.setEnabled(false);
+            jbNext10.setEnabled(false);
             jbPrev.setEnabled(false);
             jbNext.setEnabled(false);
             CompletableFuture.supplyAsync(() -> source.getPrevLatestPost(current.getPublished()))
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
+                        jbPrev10.setEnabled(true);
+                        jbNext10.setEnabled(true);
                         jbPrev.setEnabled(true);
                         jbNext.setEnabled(true);
                     }));
@@ -95,13 +143,14 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         pubLabel.setFont(pubLabel.getFont().deriveFont(Font.PLAIN | Font.ITALIC, 16.0f));
 
         JPanel pubPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        pubPanel.add(jbPrev10);
         pubPanel.add(jbPrev);
         pubPanel.add(pubLabel);
         pubPanel.add(jbNext);
+        pubPanel.add(jbNext10);
         c.gridx = 1;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
-        //c.weighty = 1.0;
         c.anchor = GridBagConstraints.LAST_LINE_START;
         comp.add(pubPanel, c);
 
@@ -110,7 +159,6 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         c.gridx = 2;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
-        //c.weighty = 1.0;
         c.weightx = 1.0;
         c.anchor = GridBagConstraints.EAST;
         comp.add(ratingLabel, c);
@@ -142,7 +190,9 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     }
 
     private void update() {
-        userLabel.setText(current.getUser().getName());
+        if (current == null) return;
+        //userLabel.setText(current.getUser().getName());
+        CompletableFuture.runAsync(() -> updateLabel(userLabel, current.getUser().getName()));
         pubLabel.setText(current.getPublished().format(DateTimeFormatter.ofPattern("d MMM uuuu HH:mm:ss Z")) + " ");
         ratingLabel.setText(current.getRating().toString() + " ");
         tagsPanel.removeAll();
@@ -196,6 +246,44 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                 });
 
 
+    }
+
+    private void updateLabel(JLabel label, String text) {
+        String oldText = label.getText();
+        if (oldText.equals(text)) return;
+        for (int i = 0; i < text.length(); i++) {
+            if (i < label.getText().length()) {
+                char[] chars = label.getText().toCharArray();
+                chars[i] = text.charAt(i);
+                SwingUtilities.invokeLater(() -> label.setText(new String(chars)));
+            } else {
+                int finalI = i;
+                SwingUtilities.invokeLater(() -> label.setText(label.getText() + text.charAt(finalI)));
+            }
+            SwingUtilities.invokeLater(() -> {
+                label.revalidate();
+                label.repaint();
+            });
+            try {
+                Thread.sleep(256);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (oldText.length() > text.length()) {
+            for (int i = 0; i < (oldText.length() - text.length()); i++) {
+                SwingUtilities.invokeLater(() -> {
+                    label.setText(label.getText().substring(0, label.getText().length() - 1));
+                    label.revalidate();
+                    label.repaint();
+                });
+                try {
+                    Thread.sleep(256);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private JComponent getSearchView() {

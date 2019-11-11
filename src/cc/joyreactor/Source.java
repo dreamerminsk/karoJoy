@@ -216,10 +216,10 @@ public class Source {
     }
 
 
-    public Post getPost(int name) {
+    public Post getPost(int postId) {
         String sql = "SELECT * FROM jr_posts WHERE post_id=?;";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, name);
+            statement.setInt(1, postId);
             Post post = recordToPost(statement);
             if (post != null) return post;
         } catch (SQLException e) {
@@ -230,7 +230,11 @@ public class Source {
     }
 
     public Post getPrevLatestPost(ZonedDateTime sinse) {
-        String sql = "SELECT * FROM jr_posts WHERE published>? ORDER BY published ASC LIMIT 1;";
+        return getPrevLatestPost(sinse, 1);
+    }
+
+    public Post getPrevLatestPost(ZonedDateTime sinse, int delta) {
+        String sql = "SELECT * FROM jr_posts WHERE published>? ORDER BY published ASC LIMIT " + delta + ";";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, sinse.toString());
             Post post = recordToPost(statement);
@@ -243,7 +247,11 @@ public class Source {
     }
 
     public Post getLatestPost(ZonedDateTime sinse) {
-        String sql = "SELECT * FROM jr_posts WHERE published<? ORDER BY published DESC LIMIT 1;";
+        return getLatestPost(sinse, 1);
+    }
+
+    public Post getLatestPost(ZonedDateTime sinse, int delta) {
+        String sql = "SELECT * FROM jr_posts WHERE published<? ORDER BY published DESC LIMIT " + delta + ";";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, sinse.toString());
             Post post = recordToPost(statement);
@@ -256,18 +264,17 @@ public class Source {
     }
 
     private Post recordToPost(PreparedStatement statement) throws SQLException {
+        Post post = new Post();
         try (ResultSet rs = statement.executeQuery()) {
-            if (rs.next()) {
-                Post post = new Post();
+            while (rs.next()) {
                 post.setId(rs.getInt(1));
                 post.setUser(getUser(rs.getString(2)));
                 post.setPublished(ZonedDateTime.parse(rs.getString(3), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
                 post.setComments(rs.getInt(4));
                 post.setRating(rs.getBigDecimal(5));
-                return post;
             }
         }
-        return null;
+        return post;
     }
 
     public int insertPost(Post post) {
@@ -293,7 +300,7 @@ public class Source {
             statement.setInt(3, post.getId());
             return statement.executeUpdate();
         } catch (SQLException ex) {
-            //JXErrorPane.showDialog(ex);
+            JXErrorPane.showDialog(ex);
         }
         return 0;
     }

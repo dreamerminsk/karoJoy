@@ -12,9 +12,9 @@ import java.sql.SQLException;
 
 public class JRViewer extends JFrame {
 
-    private static final String TITLE = "cc.joyreactor";
+    private static final String TITLE = "karoJoy";
 
-    private static final String VERSION = "v2019-11-08";
+    private static final String VERSION = "v2019-11-11";
 
     private final UpdateStats stats = new UpdateStats();
 
