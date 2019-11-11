@@ -229,6 +229,19 @@ public class Source {
         return null;
     }
 
+    public Post getPrevLatestPost(ZonedDateTime sinse) {
+        String sql = "SELECT * FROM jr_posts WHERE published>? ORDER BY published ASC LIMIT 1;";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, sinse.toString());
+            Post post = recordToPost(statement);
+            if (post != null) return post;
+        } catch (SQLException e) {
+            JXErrorPane.showDialog(e);
+            return null;
+        }
+        return null;
+    }
+
     public Post getLatestPost(ZonedDateTime sinse) {
         String sql = "SELECT * FROM jr_posts WHERE published<? ORDER BY published DESC LIMIT 1;";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
