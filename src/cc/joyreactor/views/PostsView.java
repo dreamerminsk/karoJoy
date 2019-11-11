@@ -31,7 +31,6 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private JLabel ratingLabel;
     private BufferedImage defaultPic;
     private JPanel tagsPanel;
-    private JLabel loadingLabel = new JLabel(" LOADING... ");
     private JLabel pubLabel;
     private JPanel imagesPanel;
     private JLabel postImage;
