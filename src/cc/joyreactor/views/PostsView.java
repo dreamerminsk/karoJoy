@@ -63,13 +63,13 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         comp.add(userLabel, c);
 
         pubLabel = new JLabel();
-        pubLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
-        pubLabel.setFont(pubLabel.getFont().deriveFont(Font.PLAIN, 24.0f));
+        //pubLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
+        pubLabel.setFont(pubLabel.getFont().deriveFont(Font.PLAIN | Font.ITALIC, 16.0f));
         c.gridx = 1;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
         //c.weighty = 1.0;
-        c.anchor = GridBagConstraints.FIRST_LINE_START;
+        c.anchor = GridBagConstraints.LAST_LINE_START;
         comp.add(pubLabel, c);
 
         ratingLabel = new JLabel();
@@ -88,14 +88,12 @@ public class PostsView extends JPanel implements PropertyChangeListener {
             nextButton.setText("loading...");
             nextButton.setEnabled(false);
             CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished()))
-                    .thenAcceptAsync((p) -> {
+                    .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
-                        SwingUtilities.invokeLater(this::update);
-                        SwingUtilities.invokeLater(() -> {
-                            nextButton.setText("next  >>");
-                            nextButton.setEnabled(true);
-                        });
-                    });
+                        update();
+                        nextButton.setText("next  >>");
+                        nextButton.setEnabled(true);
+                    }));
         });
         c.gridx = 3;
         c.gridy = 0;
@@ -123,11 +121,9 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private void update() {
         userLabel.setText(current.getUser().getName() + " ");
         userLabel.setIcon(new ImageIcon(defaultPic));
-        pubLabel.setText(current.getPublished().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        pubLabel.setText(current.getPublished().format(DateTimeFormatter.ofPattern("d MMM uuuu HH:MM:ss")) + " ");
         ratingLabel.setText(current.getRating().toString() + " ");
         SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
-        //SwingUtilities.invokeLater(() -> loadingLabel.setVisible(true));
-        //SwingUtilities.invokeLater(() -> tagsPanel.add(loadingLabel));
 
         CompletableFuture.supplyAsync(() -> {
             try {
