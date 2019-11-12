@@ -9,7 +9,7 @@ import java.awt.event.MouseListener;
 
 public class JTagLabel extends JLabel implements MouseListener {
 
-    private final Tag tag;
+    private Tag tag;
 
     public JTagLabel(Tag tag) {
         super();
@@ -22,6 +22,17 @@ public class JTagLabel extends JLabel implements MouseListener {
         setFont(getFont().deriveFont(Font.ITALIC, 16.0f));
         setBorder(UIManager.getBorder("ScrollPane.border"));
         addMouseListener(this);
+    }
+
+    public void setTag(Tag tag) {
+        this.tag = tag;
+        update();
+    }
+
+    private void update() {
+        setText(" " + tag.getTag() + " ");
+        revalidate();
+        repaint();
     }
 
     @Override
