@@ -286,6 +286,34 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         }
     }
 
+private void updateLabel2(JLabel label, String text) {
+        if (label.getText().equals(text)) return;
+        final int minLength = Math.min(label.getText().length(), text.length);
+        for (int i = 0; i < minLength; i++) {
+                char[] chars = label.getText().toCharArray();
+                chars[i] = text.charAt(i);
+                SwingUtilities.invokeLater(() -> label.setText(new String(chars)));
+            SwingUtilities.invokeLater(() -> {
+                label.revalidate();
+                label.repaint();
+            });
+        }
+        for (int i = minLength; i < label.getText().length(); i++) {
+            SwingUtilities.invokeLater(() -> {
+                label.setText(label.getText().substring(0, minLength) + label.getText().substring(minLength + 1));
+                label.revalidate();
+                label.repaint();
+            });
+        }
+        for (int i = minLength; i < text.length(); i++) {
+            SwingUtilities.invokeLater(() -> {
+                label.setText(label.getText() + text.charAt(i));
+                label.revalidate();
+                label.repaint();
+            });
+        }
+    }
+
     private JComponent getSearchView() {
         return new JPanel();
     }
