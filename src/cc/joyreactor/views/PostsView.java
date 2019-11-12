@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -31,7 +32,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private Source source;
     private JLabel ratingLabel;
     private BufferedImage defaultPic;
-    private JPanel tagsPanel;
+    private JTagPanel tagsPanel;
     private JLabel pubLabel;
     private JPanel imagesPanel;
     private JLabel postImage;
@@ -165,7 +166,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         comp.add(ratingLabel, c);
 
 
-        tagsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        tagsPanel = new JTagPanel(new ArrayList<>());
         c.gridx = 0;
         c.gridy = 1;
         c.gridwidth = 3;
@@ -221,14 +222,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                 });
 
         CompletableFuture.supplyAsync(() -> source.getPostTags(current.getId()))
-                .thenAcceptAsync(tags -> {
-                    SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
-                    tags.stream().sequential().map(JTagLabel::new).forEach(tl -> SwingUtilities.invokeLater(() -> {
-                        tagsPanel.add(tl);
-                        tagsPanel.revalidate();
-                        tagsPanel.repaint();
-                    }));
-                });
+                .thenAcceptAsync(tags -> tagsPanel.setTags(tags));
 
 
     }
