@@ -289,7 +289,8 @@ public class Source {
             statement.setBigDecimal(5, post.getRating());
             return statement.executeUpdate();
         } catch (SQLException ex) {
-            JXErrorPane.showDialog(ex);
+            ErrorInfo ii = new ErrorInfo("getPost( " + post.getId() + " )", ex.getMessage(), null, null, ex, null, null);
+            JXErrorPane.showDialog(null, ii);
         }
         return 0;
     }

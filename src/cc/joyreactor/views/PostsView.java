@@ -22,6 +22,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import static java.lang.Math.max;
+
 public class PostsView extends JPanel implements PropertyChangeListener {
 
     private final PostsModel model;
@@ -205,7 +207,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
             } catch (IOException e) {
                 return defaultPic;
             }
-        }).thenAcceptAsync(img -> userLabel.setIcon(new ImageIcon(img)));
+            //}).thenAcceptAsync(img -> userLabel.setIcon(new ImageIcon(img)));
+        }).thenAcceptAsync(img -> updateImage(userLabel, img));
 
         CompletableFuture.supplyAsync(() -> source.getPostImages(current.getId()))
                 .thenAcceptAsync(images -> {
@@ -230,6 +233,38 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                 });
 
 
+    }
+
+    private void updateImage(JLabel userLabel, BufferedImage img) {
+        BufferedImage logo = new BufferedImage(max(50, img.getWidth()), max(50, img.getHeight()), BufferedImage.TYPE_4BYTE_ABGR);
+        for (int i = 0; i < logo.getWidth(); i++) {
+            for (int j = 0; j < logo.getHeight(); j++) {
+                logo.setRGB(i, j, Color.WHITE.getRGB());
+            }
+        }
+        ImageIcon prev = (ImageIcon) userLabel.getIcon();
+        if (prev != null) {
+            BufferedImage prevImage = (BufferedImage) prev.getImage();
+            for (int i = 0; i < prevImage.getWidth(); i++) {
+                for (int j = 0; j < prevImage.getHeight(); j++) {
+                    logo.setRGB(i, j, prevImage.getRGB(i, j));
+                }
+            }
+        }
+        for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                logo.setRGB(i, j, img.getRGB(i, j));
+            }
+            if (i % 2 == 0) {
+                userLabel.setIcon(new ImageIcon(logo));
+                try {
+                    Thread.sleep(32);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        userLabel.setIcon(new ImageIcon(logo));
     }
 
     private void updateLabel(JLabel label, String text) {
