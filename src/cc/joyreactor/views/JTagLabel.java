@@ -35,6 +35,44 @@ public class JTagLabel extends JLabel implements MouseListener {
         repaint();
     }
 
+    private void updateText(String text) {
+        String oldText = getText();
+        if (oldText.equals(text)) return;
+        for (int i = 0; i < text.length(); i++) {
+            if (i < getText().length()) {
+                char[] chars = getText().toCharArray();
+                chars[i] = text.charAt(i);
+                SwingUtilities.invokeLater(() -> setText(new String(chars)));
+            } else {
+                int finalI = i;
+                SwingUtilities.invokeLater(() -> setText(getText() + text.charAt(finalI)));
+            }
+            SwingUtilities.invokeLater(() -> {
+                revalidate();
+                repaint();
+            });
+            try {
+                Thread.sleep(64);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (oldText.length() > text.length()) {
+            for (int i = 0; i < (oldText.length() - text.length()); i++) {
+                SwingUtilities.invokeLater(() -> {
+                    setText(getText().substring(0, getText().length() - 1));
+                    revalidate();
+                    repaint();
+                });
+                try {
+                    Thread.sleep(64);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
 

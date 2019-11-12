@@ -20,13 +20,15 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 public class PostsView extends JPanel implements PropertyChangeListener {
 
     private final PostsModel model;
-
+    private final ExecutorService ES = Executors.newSingleThreadScheduledExecutor();
     private Post current;
     private JLabel userLabel;
     private Source source;
@@ -36,6 +38,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private JLabel pubLabel;
     private JPanel imagesPanel;
     private JLabel postImage;
+    private JPanel postImages;
+    private Box imagesBox;
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -177,8 +181,9 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         comp.add(tagsPanel, c);
 
         imagesPanel = new JPanel(new BorderLayout());
+        imagesBox = Box.createVerticalBox();
         postImage = new JLabel();
-        imagesPanel.add(new JScrollPane(postImage), BorderLayout.CENTER);
+        imagesPanel.add(new JScrollPane(imagesBox), BorderLayout.CENTER);
         c.gridx = 0;
         c.gridy = 2;
         c.gridwidth = 3;
@@ -194,11 +199,10 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private void update() {
         if (current == null) return;
         //userLabel.setText(current.getUser().getName());
-        CompletableFuture.runAsync(() -> updateLabel(userLabel, current.getUser().getName()));
+        CompletableFuture.runAsync(() -> updateLabel(userLabel, current.getUser().getName()), ES);
         pubLabel.setText(current.getPublished().format(DateTimeFormatter.ofPattern("d MMM uuuu HH:mm:ss")) + " ");
         ratingLabel.setText(current.getRating().toString() + " ");
-        tagsPanel.removeAll();
-        postImage.setIcon(null);
+        imagesBox.removeAll();
 
         CompletableFuture.supplyAsync(() -> {
             try {
@@ -207,24 +211,49 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                 return defaultPic;
             }
             //}).thenAcceptAsync(img -> userLabel.setIcon(new ImageIcon(img)));
-        }).thenAcceptAsync(img -> updateImage(userLabel, img));
+        }, ES).thenAcceptAsync(img -> updateImage(userLabel, img), ES);
 
-        CompletableFuture.supplyAsync(() -> source.getPostImages(current.getId()))
-                .thenAcceptAsync(images -> {
-                    SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
-                    images.stream().limit(1).sequential().forEach((image) -> {
-                        try {
-                            postImage.setIcon(new ImageIcon(ImageIO.read(new URL(image.getRef()))));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                });
+        CompletableFuture.supplyAsync(() -> source.getPostImages(current.getId()), ES)
+                .thenAcceptAsync(images -> images.stream().sequential().forEach((image) -> {
+                    try {
+                        BufferedImage bufferedImage = ImageIO.read(new URL(image.getRef()));
+                        JLabel pImage = new JLabel();
+                        updatePostImage(pImage, bufferedImage);
+                        imagesBox.add(pImage);
+                        //postImage.setIcon(new ImageIcon(bufferedImage));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }), ES).thenRunAsync(() -> SwingUtilities.invokeLater(() -> imagesBox.revalidate()), ES);
 
-        CompletableFuture.supplyAsync(() -> source.getPostTags(current.getId()))
-                .thenAcceptAsync(tags -> tagsPanel.setTags(tags));
+        CompletableFuture.supplyAsync(() -> source.getPostTags(current.getId()), ES)
+                .thenAcceptAsync(tags -> SwingUtilities.invokeLater(() -> tagsPanel.setTags(tags)), ES);
 
 
+    }
+
+    private void updatePostImage(JLabel userLabel, BufferedImage img) {
+        BufferedImage logo = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+        for (int i = 0; i < logo.getWidth(); i++) {
+            for (int j = 0; j < logo.getHeight(); j++) {
+                logo.setRGB(i, j, Color.WHITE.getRGB());
+            }
+        }
+        for (int j = 0; j < logo.getHeight(); j++) {
+            for (int i = 0; i < logo.getWidth(); i++) {
+                logo.setRGB(i, j, img.getRGB(i, j));
+            }
+            if (j % 3 == 0) {
+                userLabel.setIcon(new ImageIcon(logo));
+                try {
+                    Thread.sleep(8);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        userLabel.setIcon(new ImageIcon(logo));
     }
 
     private void updateImage(JLabel userLabel, BufferedImage img) {
