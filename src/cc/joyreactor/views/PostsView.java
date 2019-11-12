@@ -286,30 +286,30 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         }
     }
 
-private void updateLabel2(JLabel label, String text) {
-        if (label.getText().equals(text)) return;
-        final int minLength = Math.min(label.getText().length(), text.length);
+private void updateLabel2(JLabel l, String t) {
+        if (l.getText().equals(t)) return;
+        final int minLength = Math.min(l.getText().length(), t.length());
         for (int i = 0; i < minLength; i++) {
-                char[] chars = label.getText().toCharArray();
-                chars[i] = text.charAt(i);
-                SwingUtilities.invokeLater(() -> label.setText(new String(chars)));
+                char[] chars = l.getText().toCharArray();
+                chars[i] = t.charAt(i);
+                SwingUtilities.invokeLater(() -> l.setText(new String(chars)));
             SwingUtilities.invokeLater(() -> {
-                label.revalidate();
-                label.repaint();
+                l.revalidate();
+                l.repaint();
             });
         }
-        for (int i = minLength; i < label.getText().length(); i++) {
+        for (int i = minLength; i < l.getText().length(); i++) {
             SwingUtilities.invokeLater(() -> {
-                label.setText(label.getText().substring(0, minLength) + label.getText().substring(minLength + 1));
-                label.revalidate();
-                label.repaint();
+                l.setText(l.getText().substring(0, minLength) + l.getText().substring(minLength + 1));
+                l.revalidate();
+                l.repaint();
             });
         }
-        for (int i = minLength; i < text.length(); i++) {
+        for (int i = minLength; i < t.length(); i++) {
             SwingUtilities.invokeLater(() -> {
-                label.setText(label.getText() + text.charAt(i));
-                label.revalidate();
-                label.repaint();
+                l.setText(l.getText() + t.charAt(i));
+                l.revalidate();
+                l.repaint();
             });
         }
     }
