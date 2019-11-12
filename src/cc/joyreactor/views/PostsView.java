@@ -76,8 +76,13 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         JButton jbPrev = new JButton("<");
         JButton jbNext10 = new JButton(">>");
         JButton jbPrev10 = new JButton("<<");
+        JButton jbNext100 = new JButton(">>>");
+        JButton jbPrev100 = new JButton("<<<");
+
         jbNext10.setFont(jbNext10.getFont().deriveFont(Font.ITALIC, 8.0f));
         jbNext10.addActionListener(e -> {
+            jbPrev100.setEnabled(false);
+            jbNext100.setEnabled(false);
             jbPrev10.setEnabled(false);
             jbNext10.setEnabled(false);
             jbPrev.setEnabled(false);
@@ -86,6 +91,50 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
+                        jbPrev100.setEnabled(true);
+                        jbNext100.setEnabled(true);
+                        jbPrev10.setEnabled(true);
+                        jbNext10.setEnabled(true);
+                        jbPrev.setEnabled(true);
+                        jbNext.setEnabled(true);
+                    }));
+        });
+
+        jbPrev100.setFont(jbPrev100.getFont().deriveFont(Font.ITALIC, 8.0f));
+        jbPrev100.addActionListener(e -> {
+            jbPrev100.setEnabled(false);
+            jbNext100.setEnabled(false);
+            jbPrev10.setEnabled(false);
+            jbNext10.setEnabled(false);
+            jbPrev.setEnabled(false);
+            jbNext.setEnabled(false);
+            CompletableFuture.supplyAsync(() -> source.getPrevLatestPost(current.getPublished(), 100))
+                    .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
+                        current = p;
+                        update();
+                        jbPrev100.setEnabled(true);
+                        jbNext100.setEnabled(true);
+                        jbPrev10.setEnabled(true);
+                        jbNext10.setEnabled(true);
+                        jbPrev.setEnabled(true);
+                        jbNext.setEnabled(true);
+                    }));
+        });
+
+        jbNext100.setFont(jbNext10.getFont().deriveFont(Font.ITALIC, 8.0f));
+        jbNext100.addActionListener(e -> {
+            jbPrev100.setEnabled(false);
+            jbNext100.setEnabled(false);
+            jbPrev10.setEnabled(false);
+            jbNext10.setEnabled(false);
+            jbPrev.setEnabled(false);
+            jbNext.setEnabled(false);
+            CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished(), 100))
+                    .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
+                        current = p;
+                        update();
+                        jbPrev100.setEnabled(true);
+                        jbNext100.setEnabled(true);
                         jbPrev10.setEnabled(true);
                         jbNext10.setEnabled(true);
                         jbPrev.setEnabled(true);
@@ -95,6 +144,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
         jbPrev10.setFont(jbPrev10.getFont().deriveFont(Font.ITALIC, 8.0f));
         jbPrev10.addActionListener(e -> {
+            jbPrev100.setEnabled(false);
+            jbNext100.setEnabled(false);
             jbPrev10.setEnabled(false);
             jbNext10.setEnabled(false);
             jbPrev.setEnabled(false);
@@ -103,6 +154,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
+                        jbPrev100.setEnabled(true);
+                        jbNext100.setEnabled(true);
                         jbPrev10.setEnabled(true);
                         jbNext10.setEnabled(true);
                         jbPrev.setEnabled(true);
@@ -113,6 +166,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
         jbNext.setFont(jbNext.getFont().deriveFont(Font.ITALIC, 8.0f));
         jbNext.addActionListener(e -> {
+            jbPrev100.setEnabled(false);
+            jbNext100.setEnabled(false);
             jbPrev10.setEnabled(false);
             jbNext10.setEnabled(false);
             jbPrev.setEnabled(false);
@@ -121,6 +176,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
+                        jbPrev100.setEnabled(true);
+                        jbNext100.setEnabled(true);
                         jbPrev10.setEnabled(true);
                         jbNext10.setEnabled(true);
                         jbPrev.setEnabled(true);
@@ -130,6 +187,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
         jbPrev.setFont(jbPrev.getFont().deriveFont(Font.ITALIC, 8.0f));
         jbPrev.addActionListener(e -> {
+            jbPrev100.setEnabled(false);
+            jbNext100.setEnabled(false);
             jbPrev10.setEnabled(false);
             jbNext10.setEnabled(false);
             jbPrev.setEnabled(false);
@@ -138,6 +197,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
+                        jbPrev100.setEnabled(true);
+                        jbNext100.setEnabled(true);
                         jbPrev10.setEnabled(true);
                         jbNext10.setEnabled(true);
                         jbPrev.setEnabled(true);
@@ -149,11 +210,13 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         pubLabel.setFont(pubLabel.getFont().deriveFont(Font.PLAIN | Font.ITALIC, 16.0f));
 
         JPanel pubPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        pubPanel.add(jbPrev100);
         pubPanel.add(jbPrev10);
         pubPanel.add(jbPrev);
         pubPanel.add(pubLabel);
         pubPanel.add(jbNext);
         pubPanel.add(jbNext10);
+        pubPanel.add(jbNext100);
         c.gridx = 1;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
