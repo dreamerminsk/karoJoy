@@ -244,7 +244,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                 logo.setRGB(i, j, img.getRGB(i, j));
             }
             if (j % 3 == 0) {
-                userLabel.setIcon(new ImageIcon(logo));
+                SwingUtilities.invokeLater(() -> userLabel.setIcon(new ImageIcon(logo)));
                 try {
                     Thread.sleep(8);
                 } catch (InterruptedException e) {
@@ -253,7 +253,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
             }
         }
 
-        userLabel.setIcon(new ImageIcon(logo));
+        SwingUtilities.invokeLater(() -> userLabel.setIcon(new ImageIcon(logo)));
     }
 
     private void updateImage(JLabel userLabel, BufferedImage img) {
