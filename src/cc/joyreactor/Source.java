@@ -5,6 +5,7 @@ import cc.joyreactor.data.Post;
 import cc.joyreactor.data.Tag;
 import cc.joyreactor.data.User;
 import org.jdesktop.swingx.JXErrorPane;
+import org.jdesktop.swingx.error.ErrorInfo;
 import org.sqlite.JDBC;
 
 import java.sql.*;
@@ -223,7 +224,8 @@ public class Source {
             Post post = recordToPost(statement);
             if (post != null) return post;
         } catch (SQLException e) {
-            JXErrorPane.showDialog(e);
+            ErrorInfo ii = new ErrorInfo("getPost( " + postId + " )", e.getMessage(), null, null, e, null, null);
+            JXErrorPane.showDialog(null, ii);
             return null;
         }
         return null;

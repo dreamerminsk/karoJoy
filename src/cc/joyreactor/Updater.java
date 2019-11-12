@@ -126,7 +126,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
     private void update(Post post) {
         Post dbPost = source.getPost(post.getId());
-        if (dbPost == null || dbPost.getRating() == null) {
+        if (dbPost == null || dbPost.getUser() == null) {
             System.out.println("\t\t\tNEW POSTS: " + stats.incPosts());
             System.out.println("\t\t\tNEW COMMENTS: " + stats.addComments(post.getComments()));
             System.out.println("\t\t\tNEW RATING: " + stats.addRating(post.getRating()));

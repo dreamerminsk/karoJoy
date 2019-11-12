@@ -8,8 +8,6 @@ import ch.caro62.utils.SwingExecutor;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -28,7 +26,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
     private final PostsModel model;
 
-    private Post current = null;
+    private Post current;
     private JLabel userLabel;
     private Source source;
     private JLabel ratingLabel;
@@ -196,7 +194,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         if (current == null) return;
         //userLabel.setText(current.getUser().getName());
         CompletableFuture.runAsync(() -> updateLabel(userLabel, current.getUser().getName()));
-        pubLabel.setText(current.getPublished().format(DateTimeFormatter.ofPattern("d MMM uuuu HH:mm:ss Z")) + " ");
+        pubLabel.setText(current.getPublished().format(DateTimeFormatter.ofPattern("d MMM uuuu HH:mm:ss")) + " ");
         ratingLabel.setText(current.getRating().toString() + " ");
         tagsPanel.removeAll();
         postImage.setIcon(null);
@@ -224,24 +222,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         CompletableFuture.supplyAsync(() -> source.getPostTags(current.getId()))
                 .thenAcceptAsync(tags -> {
                     SwingUtilities.invokeLater(() -> tagsPanel.removeAll());
-                    tags.stream().sequential().map(tag -> {
-                        JLabel tagLabel = new JLabel(" " + tag.getTag() + " ");
-                        tagLabel.setFont(tagLabel.getFont().deriveFont(Font.ITALIC, 16.0f));
-                        tagLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
-                        tagLabel.addMouseListener(new MouseAdapter() {
-
-                            @Override
-                            public void mouseEntered(MouseEvent e) {
-                                tagLabel.setForeground(Color.BLUE);
-                            }
-
-                            @Override
-                            public void mouseExited(MouseEvent e) {
-                                tagLabel.setForeground(Color.BLACK);
-                            }
-                        });
-                        return tagLabel;
-                    }).forEach(tl -> SwingUtilities.invokeLater(() -> {
+                    tags.stream().sequential().map(JTagLabel::new).forEach(tl -> SwingUtilities.invokeLater(() -> {
                         tagsPanel.add(tl);
                         tagsPanel.revalidate();
                         tagsPanel.repaint();
@@ -268,7 +249,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                 label.repaint();
             });
             try {
-                Thread.sleep(256);
+                Thread.sleep(64);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -281,7 +262,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                     label.repaint();
                 });
                 try {
-                    Thread.sleep(256);
+                    Thread.sleep(64);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
