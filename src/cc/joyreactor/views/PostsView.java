@@ -218,8 +218,18 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                     try {
                         BufferedImage bufferedImage = ImageIO.read(new URL(image.getRef()));
                         JLabel pImage = new JLabel();
-                        updatePostImage(pImage, bufferedImage);
+                        BufferedImage pic = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+                        for (int i = 0; i < image.getWidth(); i++) {
+                            for (int j = 0; j < image.getHeight(); j++) {
+                                pic.setRGB(i, j, Color.darkGray.getRGB());
+                            }
+                        }
+                        pImage.setIcon(new ImageIcon(pic));
+                        imagesBox.add(new JLabel(image.getRef()));
                         imagesBox.add(pImage);
+                        imagesBox.revalidate();
+                        imagesBox.repaint();
+                        updatePostImage(pImage, bufferedImage);
                         //postImage.setIcon(new ImageIcon(bufferedImage));
                     } catch (IOException e) {
                         e.printStackTrace();
