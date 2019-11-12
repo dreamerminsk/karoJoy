@@ -4,28 +4,19 @@ import cc.joyreactor.data.Image;
 import cc.joyreactor.data.Post;
 import cc.joyreactor.data.Tag;
 import cc.joyreactor.data.User;
-import cc.joyreactor.models.UpdateStats;
 import ch.caro62.services.WebClient;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import javax.swing.*;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static java.time.temporal.ChronoField.*;
 
@@ -40,11 +31,11 @@ public class PostListParser {
             .appendValue(SECOND_OF_MINUTE, 2)
             .toFormatter();
 
-    public static void parsePage() {
-            doc.select("a.next").forEach(next -> urlMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
+    public static void parsePage(Document doc) {
+        //doc.select("a.next").forEach(next -> urlMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
 
-            doc.select("div.postContainer").stream().map(this::parsePost)
-                    .forEachOrdered(this::update);
+        //doc.select("div.postContainer").stream().map(this::parsePost)
+        //.forEachOrdered(this::update);
     }
 
     public static String getPageNum(String value) {
@@ -105,9 +96,9 @@ public class PostListParser {
         return post.select("div.uhead_nick").stream()
                 .flatMap(user -> user.select(".avatar").stream()
                         .map(av -> {
-                                byte[] avatar = WebClient.getBytesSync(av.attr("abs:src")).get();
-                                User u = new User(0, user.text(), avatar);
-                                return u;
+                            byte[] avatar = WebClient.getBytesSync(av.attr("abs:src")).get();
+                            User u = new User(0, user.text(), avatar);
+                            return u;
                         })
                 ).findFirst().orElse(null);
     }
@@ -142,12 +133,12 @@ public class PostListParser {
     public static List<Tag> parseTags(Element post) {
         List<Tag> tags = new ArrayList<>();
         post.select(".taglist a[title]").forEach(tagItem -> {
-            String idString = tag.attr("data-ids").split(",")[0];
-            new Tag(0,
-                        tagItem.attr("title"),
-                        tagItem.attr("abs:href"),
-                        tagItem.attr("data-ids")));
-                tags.add(tag);
+            String idString = tagItem.attr("data-ids").split(",")[0];
+            Tag tag = new Tag(0,
+                    tagItem.attr("title"),
+                    tagItem.attr("abs:href"),
+                    tagItem.attr("data-ids"));
+            tags.add(tag);
         });
         return tags;
     }

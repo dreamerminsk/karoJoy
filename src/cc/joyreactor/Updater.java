@@ -74,7 +74,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     }
 
     private void parsePage() {
-        Map.Entry<String, String> tagRef = urlMap.pollFirstEntry();
+        Map.Entry<String, String> tagRef = urlMap.pollLastEntry();
         LocalTime start = LocalTime.now();
         Timer timer = metricRegistry.timer(Thread.currentThread().getName());
         Timer.Context context = timer.time();
@@ -126,7 +126,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
     private void update(Post post) {
         Post dbPost = source.getPost(post.getId());
-        if (dbPost == null || dbPost.getPublished() == null) {
+        if (dbPost == null || dbPost.getRating() == null) {
             System.out.println("\t\t\tNEW POSTS: " + stats.incPosts());
             System.out.println("\t\t\tNEW COMMENTS: " + stats.addComments(post.getComments()));
             System.out.println("\t\t\tNEW RATING: " + stats.addRating(post.getRating()));

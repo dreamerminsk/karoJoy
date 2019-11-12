@@ -3,6 +3,7 @@ package cc.joyreactor.views;
 import cc.joyreactor.Source;
 import cc.joyreactor.data.Post;
 import cc.joyreactor.models.PostsModel;
+import ch.caro62.utils.SwingExecutor;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,6 +21,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 public class PostsView extends JPanel implements PropertyChangeListener {
 
@@ -58,7 +61,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         GridBagConstraints c = new GridBagConstraints();
 
         userLabel = new JLabel();
-        userLabel.setFont(new Font("Monospace", Font.PLAIN, 28));
+        userLabel.setFont(new Font("Lucida Console", Font.PLAIN, 26));
         c.gridx = 0;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
@@ -286,33 +289,28 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         }
     }
 
-private void updateLabel2(JLabel l, String t) {
+    private void updateLabel2(JLabel l, String t) {
         if (l.getText().equals(t)) return;
         final int minLength = Math.min(l.getText().length(), t.length());
-        for (int i = 0; i < minLength; i++) {
-                char[] chars = l.getText().toCharArray();
-                chars[i] = t.charAt(i);
-                SwingUtilities.invokeLater(() -> l.setText(new String(chars)));
-            SwingUtilities.invokeLater(() -> {
-                l.revalidate();
-                l.repaint();
-            });
-        }
-        for (int i = minLength; i < l.getText().length(); i++) {
-            SwingUtilities.invokeLater(() -> {
-                l.setText(l.getText().substring(0, minLength) + l.getText().substring(minLength + 1));
-                l.revalidate();
-                l.repaint();
-            });
-        }
-        for (int i = minLength; i < t.length(); i++) {
-            SwingUtilities.invokeLater(() -> {
-                l.setText(l.getText() + t.charAt(i));
-                l.revalidate();
-                l.repaint();
-            });
-        }
+        IntStream.range(0, minLength).forEach(i -> {
+            char[] chars = l.getText().toCharArray();
+            chars[i] = t.charAt(i);
+            System.out.println("TITLE: " + new String(chars));
+            updateLabelTitle(l, new String(chars));
+        });
+        IntStream.range(minLength, l.getText().length()).forEach(i -> updateLabelTitle(l, l.getText().substring(0, minLength) + l.getText().substring(minLength + 1)));
+        IntStream.range(minLength, t.length()).forEach(i -> updateLabelTitle(l, l.getText() + t.charAt(i)));
     }
+
+    private void updateLabelTitle(JLabel l, String t) {
+        System.out.println("TITLE: " + t);
+        SwingExecutor.schedule(() -> {
+            l.setText(t);
+            l.revalidate();
+            l.repaint();
+        }, 32, TimeUnit.MILLISECONDS);
+    }
+
 
     private JComponent getSearchView() {
         return new JPanel();
