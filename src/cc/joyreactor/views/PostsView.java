@@ -22,8 +22,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import static java.lang.Math.max;
-
 public class PostsView extends JPanel implements PropertyChangeListener {
 
     private final PostsModel model;
@@ -236,7 +234,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     }
 
     private void updateImage(JLabel userLabel, BufferedImage img) {
-        BufferedImage logo = new BufferedImage(max(50, img.getWidth()), max(50, img.getHeight()), BufferedImage.TYPE_4BYTE_ABGR);
+        BufferedImage logo = new BufferedImage(50, 50, BufferedImage.TYPE_4BYTE_ABGR);
         for (int i = 0; i < logo.getWidth(); i++) {
             for (int j = 0; j < logo.getHeight(); j++) {
                 logo.setRGB(i, j, Color.WHITE.getRGB());
@@ -251,19 +249,33 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                 }
             }
         }
-        for (int i = 0; i < img.getWidth(); i++) {
-            for (int j = 0; j < img.getHeight(); j++) {
-                logo.setRGB(i, j, img.getRGB(i, j));
+
+        int diffX = (logo.getWidth() - img.getWidth()) / 2;
+        int diffX2 = logo.getWidth() - img.getWidth() - diffX;
+        int diffY = (logo.getHeight() - img.getHeight()) / 2;
+        int diffY2 = logo.getHeight() - img.getHeight() - diffY;
+        for (int i = 0; i < logo.getWidth(); i++) {
+            for (int j = 0; j < logo.getHeight(); j++) {
+                try {
+                    if ((i < diffX) || (i > (logo.getWidth() - diffX2 - 1)) || (j < diffY) || (j > (logo.getHeight() - diffY2 - 1))) {
+                        logo.setRGB(i, j, Color.WHITE.getRGB());
+                    } else {
+                        logo.setRGB(i, j, img.getRGB(i - diffX, j - diffY));
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, e.getMessage(), "[" + (i - diffX) + " / " + img.getWidth() + ", " + (j - diffY) + " / " + img.getHeight() + "] ", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
             if (i % 2 == 0) {
                 userLabel.setIcon(new ImageIcon(logo));
                 try {
-                    Thread.sleep(32);
+                    Thread.sleep(16);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
+
         userLabel.setIcon(new ImageIcon(logo));
     }
 
