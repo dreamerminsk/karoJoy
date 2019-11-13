@@ -274,23 +274,23 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         postImage = new JLabel();
         imagesPanel.add(new JScrollPane(imagesBox), BorderLayout.CENTER);
         c.gridx = 0;
-        c.gridy = 2;
-        c.gridwidth = 2;
+        c.gridy = 3;
+        c.gridwidth = 3;
         c.insets = new Insets(5, 5, 5, 5);
         c.weighty = 1.0;
-        //c.weightx = 1.0;
+        c.weightx = 2.0;
         c.fill = GridBagConstraints.BOTH;
         comp.add(imagesPanel, c);
 
         tagStats = new JTagStatsView();
-        c.gridx = 2;
-        c.gridy = 2;
-        c.gridwidth = 2;
+        c.gridx = 3;
+        c.gridy = 3;
+        c.gridwidth = 1;
         c.insets = new Insets(5, 5, 5, 5);
         c.weighty = 1.0;
-        //c.weightx = 1.0;
+        c.weightx = 1.0;
         c.fill = GridBagConstraints.BOTH;
-        comp.add(tagStats, c);
+        comp.add(new JScrollPane(tagStats), c);
 
         return comp;
     }

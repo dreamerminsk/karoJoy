@@ -48,7 +48,7 @@ public class JTagPanel extends JPanel {
                 return new JTagLabel(newTags.get(i));
             }).forEachOrdered(this::add);
         } else {
-            IntStream.range(0, getComponentCount()).forEachOrdered(i ->
+            IntStream.range(0, newTags.size()).forEachOrdered(i ->
             {
                 ((JTagLabel) getComponent(i)).setTag(newTags.get(i));
                 revalidate();
