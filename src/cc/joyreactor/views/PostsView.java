@@ -40,6 +40,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private JLabel postImage;
     private JPanel postImages;
     private Box imagesBox;
+    private JLabel commentsLabel;
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -223,12 +224,22 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         c.anchor = GridBagConstraints.LAST_LINE_START;
         comp.add(pubPanel, c);
 
-        ratingLabel = new JLabel();
-        ratingLabel.setFont(ratingLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
+
+        commentsLabel = new JLabel();
+        commentsLabel.setFont(commentsLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
         c.gridx = 2;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
         c.weightx = 1.0;
+        c.anchor = GridBagConstraints.EAST;
+        comp.add(commentsLabel, c);
+
+        ratingLabel = new JLabel();
+        ratingLabel.setFont(ratingLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
+        c.gridx = 3;
+        c.gridy = 0;
+        c.insets = new Insets(5, 5, 5, 5);
+        c.weightx = 0.0;
         c.anchor = GridBagConstraints.EAST;
         comp.add(ratingLabel, c);
 
@@ -236,7 +247,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         tagsPanel = new JTagPanel(new ArrayList<>());
         c.gridx = 0;
         c.gridy = 1;
-        c.gridwidth = 3;
+        c.gridwidth = 4;
         c.insets = new Insets(5, 5, 5, 5);
         //c.weighty = 1.0;
         //c.weightx = 1.0;
@@ -249,7 +260,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         imagesPanel.add(new JScrollPane(imagesBox), BorderLayout.CENTER);
         c.gridx = 0;
         c.gridy = 2;
-        c.gridwidth = 3;
+        c.gridwidth = 4;
         c.insets = new Insets(5, 5, 5, 5);
         c.weighty = 1.0;
         //c.weightx = 1.0;
@@ -265,6 +276,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         CompletableFuture.runAsync(() -> updateLabel(userLabel, current.getUser().getName()), ES);
         pubLabel.setText(current.getPublished().format(DateTimeFormatter.ofPattern("d MMM uuuu HH:mm:ss")) + " ");
         ratingLabel.setText(current.getRating().toString() + " ");
+        commentsLabel.setText(current.getComments().toString() + " ");
         imagesBox.removeAll();
 
         CompletableFuture.supplyAsync(() -> {
