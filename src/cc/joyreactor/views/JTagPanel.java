@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 public class JTagPanel extends JPanel {
 
-    public static final int MS = 512;
+    public static final int MS = 64;
     private final List<Tag> tags = new ArrayList<>();
 
     //private final List<JTagLabel> tagLabels = new ArrayList<>();
