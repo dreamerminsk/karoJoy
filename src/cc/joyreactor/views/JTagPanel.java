@@ -31,27 +31,24 @@ public class JTagPanel extends JPanel {
         if (newTags.size() >= getComponentCount()) {
             IntStream.range(0, getComponentCount()).forEachOrdered(i ->
             {
-                tags.set(i, newTags.get(i));
                 ((JTagLabel) getComponent(i)).setTag(newTags.get(i));
                 pause(MS);
             });
 
             IntStream.range(getComponentCount(), newTags.size()).mapToObj(i ->
             {
-                tags.add(newTags.get(i));
                 pause(MS);
                 return new JTagLabel(newTags.get(i));
             }).forEachOrdered(this::add);
         } else {
-            IntStream.range(0, tags.size()).forEachOrdered(i ->
+            IntStream.range(0, getComponentCount()).forEachOrdered(i ->
             {
-                tags.set(i, newTags.get(i));
                 ((JTagLabel) getComponent(i)).setTag(newTags.get(i));
                 pause(MS);
             });
 
             int components = getComponentCount();
-            IntStream.range(tags.size(), components).mapToObj(i -> getComponent(tags.size())).forEachOrdered(this::remove);
+            IntStream.range(newTags.size(), components).mapToObj(i -> getComponent(newTags.size())).forEachOrdered(this::remove);
         }
     }
 
