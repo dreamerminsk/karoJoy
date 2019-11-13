@@ -1,10 +1,13 @@
 package cc.joyreactor.views;
 
-public JTagStatsView extends JPanel {
+import javax.swing.*;
+import java.awt.*;
+
+public class JTagStatsView extends JPanel {
 
     public JTagStatsView() {
-super(new BorderLayout());
-setupUi();
+        super(new BorderLayout());
+        setupUi();
     }
 
     public void setupUi() {

@@ -30,9 +30,11 @@ public class JTagLabel extends JLabel implements MouseListener {
     }
 
     private void update() {
-        setText(" " + tag.getTag() + " ");
-        revalidate();
-        repaint();
+        SwingUtilities.invokeLater(() -> {
+            setText(" " + tag.getTag() + " ");
+            revalidate();
+            repaint();
+        });
     }
 
     private void updateText(String text) {

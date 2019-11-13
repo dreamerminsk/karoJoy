@@ -39,7 +39,8 @@ public class JTagPanel extends JPanel {
                 pause(MS);
             });
 
-            IntStream.range(getComponentCount(), newTags.size()).mapToObj(i ->
+            int comps = getComponentCount();
+            IntStream.range(comps, newTags.size()).mapToObj(i ->
             {
                 revalidate();
                 repaint();
