@@ -3,6 +3,7 @@ package cc.joyreactor.views;
 import cc.joyreactor.Source;
 import cc.joyreactor.data.Post;
 import cc.joyreactor.models.PostsModel;
+import cc.joyreactor.utils.Strings;
 import ch.caro62.utils.SwingExecutor;
 
 import javax.imageio.ImageIO;
@@ -15,6 +16,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -227,12 +230,11 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
 
         commentsLabel = new JLabel();
-        try (InputStream stream = this.getClass().getResourceAsStream("/cc/joyreactor/icons/instagram-stories-comments-32px.png")) {
+        try (InputStream stream = this.getClass().getResourceAsStream("/cc/joyreactor/icons/instagram-stories-comments-48px.png")) {
             commentsLabel.setIcon(new ImageIcon(ImageIO.read(stream)));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        commentsLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
         commentsLabel.setFont(commentsLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
         c.gridx = 2;
         c.gridy = 0;
@@ -242,12 +244,11 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         comp.add(commentsLabel, c);
 
         ratingLabel = new JLabel();
-        try (InputStream stream = this.getClass().getResourceAsStream("/cc/joyreactor/icons/instagram-stories-rating-32px.png")) {
+        try (InputStream stream = this.getClass().getResourceAsStream("/cc/joyreactor/icons/instagram-stories-rating-48px.png")) {
             ratingLabel.setIcon(new ImageIcon(ImageIO.read(stream)));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ratingLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
         ratingLabel.setFont(ratingLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
         c.gridx = 3;
         c.gridy = 0;
@@ -313,7 +314,10 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                             }
                         }
                         pImage.setIcon(new ImageIcon(pic));
-                        imagesBox.add(new JLabel(image.getRef()));
+                        JLabel label = new JLabel(Strings.getLastSplitComponent(
+                                URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"));
+                        label.setFont(label.getFont().deriveFont(16.0f));
+                        imagesBox.add(label);
                         imagesBox.add(pImage);
                         imagesBox.revalidate();
                         imagesBox.repaint();
