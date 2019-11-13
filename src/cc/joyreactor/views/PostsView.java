@@ -13,6 +13,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -226,6 +227,12 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
 
         commentsLabel = new JLabel();
+        try (InputStream stream = this.getClass().getResourceAsStream("/cc/joyreactor/icons/instagram-stories-comments-32px.png")) {
+            commentsLabel.setIcon(new ImageIcon(ImageIO.read(stream)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        commentsLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
         commentsLabel.setFont(commentsLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
         c.gridx = 2;
         c.gridy = 0;
@@ -235,6 +242,12 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         comp.add(commentsLabel, c);
 
         ratingLabel = new JLabel();
+        try (InputStream stream = this.getClass().getResourceAsStream("/cc/joyreactor/icons/instagram-stories-rating-32px.png")) {
+            ratingLabel.setIcon(new ImageIcon(ImageIO.read(stream)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ratingLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
         ratingLabel.setFont(ratingLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
         c.gridx = 3;
         c.gridy = 0;
