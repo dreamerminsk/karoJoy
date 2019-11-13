@@ -31,12 +31,18 @@ public class JTagPanel extends JPanel {
         if (newTags.size() >= getComponentCount()) {
             IntStream.range(0, getComponentCount()).forEachOrdered(i ->
             {
-                ((JTagLabel) getComponent(i)).setTag(newTags.get(i));
+                SwingUtilities.invokeLater(() -> {
+                    ((JTagLabel) getComponent(i)).setTag(newTags.get(i));
+                    revalidate();
+                    repaint();
+                });
                 pause(MS);
             });
 
             IntStream.range(getComponentCount(), newTags.size()).mapToObj(i ->
             {
+                revalidate();
+                repaint();
                 pause(MS);
                 return new JTagLabel(newTags.get(i));
             }).forEachOrdered(this::add);
@@ -44,6 +50,8 @@ public class JTagPanel extends JPanel {
             IntStream.range(0, getComponentCount()).forEachOrdered(i ->
             {
                 ((JTagLabel) getComponent(i)).setTag(newTags.get(i));
+                revalidate();
+                repaint();
                 pause(MS);
             });
 
