@@ -328,8 +328,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                         JLabel label = new JLabel(Strings.getLastSplitComponent(
                                 URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"));
                         label.setFont(label.getFont().deriveFont(16.0f));
-                        imagesBox.add(label);
-                        imagesBox.add(pImage);
+                        imagesBox.add(label, JComponent.CENTER_ALIGNMENT);
+                        imagesBox.add(pImage, JComponent.CENTER_ALIGNMENT);
                         imagesBox.revalidate();
                         imagesBox.repaint();
                         updatePostImage(pImage, bufferedImage);

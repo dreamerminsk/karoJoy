@@ -8,11 +8,14 @@ import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.sqlite.JDBC;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Source {
@@ -306,5 +309,21 @@ public class Source {
             JXErrorPane.showDialog(ex);
         }
         return 0;
+    }
+
+    public Map<String, BigDecimal> getThisMonthTags() {
+        Map<String, BigDecimal> tags = new TreeMap<>();
+        String sql = "SELECT * FROM q_this_month_tags;";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    tags.put(rs.getString(1), rs.getBigDecimal(2));
+                }
+            }
+        } catch (SQLException e) {
+            JXErrorPane.showFrame(e);
+            return tags;
+        }
+        return tags;
     }
 }
