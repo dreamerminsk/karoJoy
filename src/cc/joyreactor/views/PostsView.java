@@ -12,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -234,8 +235,9 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                 AtomicReference<String> text = new AtomicReference<>("");
                 pubLabel.getText().chars().forEachOrdered(chr -> {
                     text.updateAndGet(v -> v + (char) chr);
-                    if (!metrics.getStringBounds(text.get(), g).contains(e.getPoint())) {
-                        JOptionPane.showMessageDialog(null, text);
+                    Rectangle2D stringBounds = metrics.getStringBounds(text.get(), g);
+                    if (!stringBounds.contains(e.getPoint())) {
+                        JOptionPane.showMessageDialog(null, stringBounds + ", " + e.getPoint() + ", " + text);
                     }
                 });
                 g.dispose();
