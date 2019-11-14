@@ -31,6 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
@@ -233,11 +234,15 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
                 Graphics g = pubLabel.getGraphics();
                 AtomicReference<String> text = new AtomicReference<>("");
+                AtomicBoolean isFirst = new AtomicBoolean(true);
                 pubLabel.getText().chars().forEachOrdered(chr -> {
                     text.updateAndGet(v -> v + (char) chr);
                     Rectangle2D stringBounds = metrics.getStringBounds(text.get(), g);
-                    if (!stringBounds.contains(e.getPoint())) {
-                        JOptionPane.showMessageDialog(null, stringBounds + ", " + e.getPoint() + ", " + text);
+                    if (stringBounds.getWidth() > e.getPoint().getX()) {
+                        if (isFirst.getAndSet(false)) {
+                            JOptionPane.showMessageDialog(null, stringBounds + ", " + e.getPoint() + ", " + text);
+                        }
+
                     }
                 });
                 g.dispose();
