@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import static java.lang.String.format;
 public class UpdaterView extends JPanel implements PropertyChangeListener {
 
     private final UpdateStats stats;
+    private PropertyChangeSupport changes = new PropertyChangeSupport(this);
     private final ThreadBoxModel threadBoxModel = new ThreadBoxModel();
     private final JComboBox<String> threads = new JComboBox<>(threadBoxModel);
     private JLabel newUsersLabel;
@@ -56,6 +58,10 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         threads.setFont(threads.getFont().deriveFont(14.0f));
         //threads.setPrototypeDisplayValue("XX - XX:XX:XX.XXX - XXXXXXXXXXXXXXXXXXXXXXX - XXXXXX");
         add(threads);
+
+        JButton startButton = new JButton("START");
+        add(startButton);
+        startButton.addActionListener((e) -> changes.firePropertyChange("start", false, true));
     }
 
     @Override
@@ -71,6 +77,14 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         } else if (evt.getPropertyName().equalsIgnoreCase("threads")) {
             SwingUtilities.invokeLater(() -> threadBoxModel.update((java.util.List<String>) evt.getNewValue()));
         }
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener l) {
+        changes.addPropertyChangeListener(l);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener l) {
+        changes.removePropertyChangeListener(l);
     }
 
 

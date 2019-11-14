@@ -7,14 +7,17 @@ import cc.joyreactor.views.UpdaterView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class JRViewer extends JFrame {
+public class JRViewer extends JFrame implements PropertyChangeListener {
 
     private static final String TITLE = "karoJoy";
 
     private static final String VERSION = "v2019-11-11";
+    private static Updater updater;
 
     private final UpdateStats stats = new UpdateStats();
 
@@ -36,13 +39,23 @@ public class JRViewer extends JFrame {
             e.printStackTrace();
         }
         JRViewer jrViewer = new JRViewer();
-        Updater updater = new Updater(jrViewer.stats);
+        updater = new Updater(jrViewer.stats);
         updater.execute();
     }
 
     private void setupUi() throws SQLException, IOException {
         add(new PostsView(new PostsModel()), BorderLayout.CENTER);
-        add(new JScrollPane(new UpdaterView(stats)), BorderLayout.PAGE_END);
+        UpdaterView updaterView = new UpdaterView(stats);
+        updaterView.addPropertyChangeListener(this);
+        add(new JScrollPane(updaterView), BorderLayout.PAGE_END);
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("start")) {
+            if ((boolean) evt.getNewValue()) {
+                updater.execute();
+            }
+        }
+    }
 }

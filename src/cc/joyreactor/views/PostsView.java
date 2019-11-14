@@ -336,8 +336,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                                 .thenAcceptAsync((pic) -> SwingUtilities.invokeLater(() ->
                                 {
                                     imagesMenu.add(new JLabel(new ImageIcon(pic)));
-                                    imagesMenu.revalidate();
-                                    imagesMenu.repaint();
+                                    imagesPanel.revalidate();
+                                    imagesPanel.repaint();
                                 }), ES);
                         JLabel pImage = new JLabel();
                         JLabel label = new JLabel(Strings.getLastSplitComponent(
