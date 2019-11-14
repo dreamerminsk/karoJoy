@@ -334,7 +334,11 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                                         Scalr.Mode.AUTOMATIC,
                                         128, 128), ES)
                                 .thenAcceptAsync((pic) -> SwingUtilities.invokeLater(() ->
-                                        imagesMenu.add(new JLabel(new ImageIcon(pic)))), ES);
+                                {
+                                    imagesMenu.add(new JLabel(new ImageIcon(pic)));
+                                    imagesMenu.revalidate();
+                                    imagesMenu.repaint();
+                                }), ES);
                         JLabel pImage = new JLabel();
                         JLabel label = new JLabel(Strings.getLastSplitComponent(
                                 URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"));
