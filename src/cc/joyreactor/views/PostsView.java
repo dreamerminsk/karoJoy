@@ -10,6 +10,8 @@ import org.imgscalr.Scalr;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -28,6 +30,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 public class PostsView extends JPanel implements PropertyChangeListener {
@@ -217,6 +220,28 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
         pubLabel = new JLabel();
         pubLabel.setFont(pubLabel.getFont().deriveFont(Font.PLAIN | Font.ITALIC, 16.0f));
+        pubLabel.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                FontMetrics metrics = getFontMetrics(pubLabel.getFont());
+
+                Graphics g = pubLabel.getGraphics();
+                AtomicReference<String> text = new AtomicReference<>("");
+                pubLabel.getText().chars().forEachOrdered(chr -> {
+                    text.updateAndGet(v -> v + (char) chr);
+                    if (!metrics.getStringBounds(text.get(), g).contains(e.getPoint())) {
+                        JOptionPane.showMessageDialog(null, text);
+                    }
+                });
+                g.dispose();
+
+            }
+        });
         JPanel pubPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         pubPanel.add(jbPrev100);
