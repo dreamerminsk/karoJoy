@@ -28,6 +28,7 @@ public class JTagStatsView extends JPanel {
     public void setupUi() {
         add(getMenu(), BorderLayout.PAGE_START);
         table = new JTable(16, 2);
+        table.setAutoCreateColumnsFromModel(true);
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
 
