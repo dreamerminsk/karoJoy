@@ -332,7 +332,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                                 Scalr.resize(bufferedImage,
                                         Scalr.Method.ULTRA_QUALITY,
                                         Scalr.Mode.AUTOMATIC,
-                                        128, 128), ES)
+                                        64, 64), ES)
                                 .thenAcceptAsync((pic) -> SwingUtilities.invokeLater(() ->
                                 {
                                     imagesMenu.add(new JLabel(new ImageIcon(pic)));
