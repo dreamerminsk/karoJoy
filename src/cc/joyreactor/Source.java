@@ -326,4 +326,36 @@ public class Source {
         }
         return tags;
     }
+
+    public Map<String, BigDecimal> getLastDayTags() {
+        Map<String, BigDecimal> tags = new TreeMap<>();
+        String sql = "SELECT * FROM q_last_day_tags;";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    tags.put(rs.getString(1), rs.getBigDecimal(2).setScale(1));
+                }
+            }
+        } catch (SQLException e) {
+            JXErrorPane.showFrame(e);
+            return tags;
+        }
+        return tags;
+    }
+
+    public Map<String, BigDecimal> getLastWeekTags() {
+        Map<String, BigDecimal> tags = new TreeMap<>();
+        String sql = "SELECT * FROM q_last_week_tags;";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    tags.put(rs.getString(1), rs.getBigDecimal(2).setScale(1));
+                }
+            }
+        } catch (SQLException e) {
+            JXErrorPane.showFrame(e);
+            return tags;
+        }
+        return tags;
+    }
 }

@@ -17,5 +17,6 @@
     <orderEntry type="library" name="com.squareup.okhttp3:okhttp:3.14.0" level="project" />
     <orderEntry type="library" name="com.google.guava:guava:27.1-jre" level="project" />
     <orderEntry type="library" name="org.iq80.leveldb:leveldb:0.12" level="project" />
+    <orderEntry type="library" name="org.imgscalr:imgscalr-lib:4.2" level="project" />
   </component>
 </module>

@@ -8,20 +8,49 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class JTagStatsView extends JPanel {
 
+    private Source source;
     private JTable table;
 
     public JTagStatsView() {
         super(new BorderLayout());
+        try {
+            source = Source.getInstance();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         setupUi();
-        update();
     }
 
     public void setupUi() {
-        table = new JTable(10, 2);
-        add(new JScrollPane(table));
+        add(getMenu(), BorderLayout.PAGE_START);
+        table = new JTable(16, 2);
+        add(new JScrollPane(table), BorderLayout.CENTER);
+    }
+
+    private JComponent getMenu() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        ButtonGroup group = new ButtonGroup();
+
+        JButton lastDay = new JButton("last day");
+        lastDay.addActionListener((e) -> CompletableFuture.supplyAsync(() ->
+                source.getLastDayTags()).thenAcceptAsync((Map<String, BigDecimal> tags) ->
+                SwingUtilities.invokeLater(() -> table.setModel(new TagsModel(tags)))));
+        group.add(lastDay);
+        panel.add(lastDay);
+
+        JButton lastWeek = new JButton("last week");
+        lastWeek.addActionListener((e) -> CompletableFuture.supplyAsync(() ->
+                source.getLastWeekTags()).thenAcceptAsync((Map<String, BigDecimal> tags) ->
+                SwingUtilities.invokeLater(() -> table.setModel(new TagsModel(tags)))));
+        group.add(lastWeek);
+        panel.add(lastWeek);
+
+        lastWeek.doClick();
+        return panel;
     }
 
     private void update() {

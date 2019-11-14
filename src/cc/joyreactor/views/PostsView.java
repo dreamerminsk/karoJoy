@@ -5,6 +5,7 @@ import cc.joyreactor.data.Post;
 import cc.joyreactor.models.PostsModel;
 import cc.joyreactor.utils.Strings;
 import ch.caro62.utils.SwingExecutor;
+import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -46,6 +47,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private Box imagesBox;
     private JLabel commentsLabel;
     private JTagStatsView tagStats;
+    private JPanel imagesMenu;
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -270,8 +272,10 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         comp.add(tagsPanel, c);
 
         imagesPanel = new JPanel(new BorderLayout());
+        imagesMenu = new JPanel(new FlowLayout(FlowLayout.CENTER));
         imagesBox = Box.createVerticalBox();
         postImage = new JLabel();
+        imagesPanel.add(new JScrollPane(imagesMenu), BorderLayout.PAGE_START);
         imagesPanel.add(new JScrollPane(imagesBox), BorderLayout.CENTER);
         c.gridx = 0;
         c.gridy = 3;
@@ -303,6 +307,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         ratingLabel.setText(current.getRating().toString() + " ");
         commentsLabel.setText(current.getComments().toString() + " ");
         imagesBox.removeAll();
+        imagesMenu.removeAll();
 
         CompletableFuture.supplyAsync(() -> {
             try {
@@ -318,21 +323,16 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                     try {
                         BufferedImage bufferedImage = ImageIO.read(new URL(image.getRef()));
                         JLabel pImage = new JLabel();
-                        BufferedImage pic = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-                        for (int i = 0; i < image.getWidth(); i++) {
-                            for (int j = 0; j < image.getHeight(); j++) {
-                                pic.setRGB(i, j, Color.darkGray.getRGB());
-                            }
-                        }
-                        pImage.setIcon(new ImageIcon(pic));
+                        BufferedImage pic = Scalr.resize(bufferedImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.AUTOMATIC, 128, 128);
+                        imagesMenu.add(new JLabel(new ImageIcon(pic)));
                         JLabel label = new JLabel(Strings.getLastSplitComponent(
                                 URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"));
                         label.setFont(label.getFont().deriveFont(16.0f));
-                        imagesBox.add(label, JComponent.CENTER_ALIGNMENT);
-                        imagesBox.add(pImage, JComponent.CENTER_ALIGNMENT);
-                        imagesBox.revalidate();
-                        imagesBox.repaint();
-                        updatePostImage(pImage, bufferedImage);
+                        //imagesBox.add(label, JComponent.CENTER_ALIGNMENT);
+                        //imagesBox.add(pImage, JComponent.CENTER_ALIGNMENT);
+                        //imagesBox.revalidate();
+                        //imagesBox.repaint();
+                        //updatePostImage(pImage, bufferedImage);
                         //postImage.setIcon(new ImageIcon(bufferedImage));
                     } catch (IOException e) {
                         e.printStackTrace();
