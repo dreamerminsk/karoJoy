@@ -40,7 +40,6 @@ public class JRViewer extends JFrame implements PropertyChangeListener {
         }
         JRViewer jrViewer = new JRViewer();
         updater = new Updater(jrViewer.stats);
-        updater.execute();
     }
 
     private void setupUi() throws SQLException, IOException {
