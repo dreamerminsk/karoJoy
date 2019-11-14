@@ -53,7 +53,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         urlMap.put("JoyReactor", "http://joyreactor.cc/best");
         urlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
         urlMap.put("Anime", "http://anime.reactor.cc/new");
-        urlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
+        //urlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
@@ -69,7 +69,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     @Override
     protected UpdateStats doInBackground() {
         IntStream.range(0, THREAD_COUNT).forEach(i -> scheduler.scheduleWithFixedDelay(this::parsePage,
-                THREAD_COUNT * i,
+                THREAD_COUNT * i + THREAD_COUNT,
                 ThreadLocalRandom.current().nextInt(8, 16),
                 TimeUnit.SECONDS));
         return stats;
@@ -97,7 +97,6 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
             doc.select("div.postContainer").stream().map(this::parsePost)
                     .forEachOrdered(this::update);
-            //urlMap.put(tag, null);
         });
         context.stop();
         LocalTime finish = LocalTime.now();
