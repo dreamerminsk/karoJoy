@@ -76,10 +76,15 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     }
 
     private void parsePage() {
-        Map.Entry<String, String> tagRef = urlMap.pollLastEntry();
-        LocalTime start = LocalTime.now();
         Timer timer = metricRegistry.timer(Thread.currentThread().getName());
         Timer.Context context = timer.time();
+        LocalTime start = LocalTime.now();
+        Map.Entry<String, String> tagRef;
+        if (ThreadLocalRandom.current().nextBoolean()) {
+            tagRef = urlMap.pollLastEntry();
+        } else {
+            tagRef = urlMap.pollFirstEntry();
+        }
         stats.addThread(
                 getThreadNum(Thread.currentThread().getName()),
                 Thread.currentThread().getName() + " - " +
