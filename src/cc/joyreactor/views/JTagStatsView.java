@@ -7,9 +7,12 @@ import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class JTagStatsView extends JPanel {
 
@@ -66,16 +69,19 @@ public class JTagStatsView extends JPanel {
         group.add(lastYear);
         panel.add(lastYear);
 
-        lastWeek.doClick();
+        lastDay.doClick();
         return panel;
     }
 
     public static class TagsModel extends AbstractTableModel {
 
-        private final Map<String, BigDecimal> tags;
+        private final Map<String, BigDecimal> tags = new HashMap<>();
 
         public TagsModel(Map<String, BigDecimal> tags) {
-            this.tags = tags;
+            List<BigDecimal> values = tags.values().stream().sorted().collect(Collectors.toList());
+            values.forEach(value -> tags.entrySet().stream().filter((tag) -> tag.getValue().equals(value)).forEachOrdered(item -> {
+                this.tags.put(item.getKey(), item.getValue());
+            }));
         }
 
         @Override

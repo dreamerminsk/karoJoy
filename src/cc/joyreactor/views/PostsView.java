@@ -322,10 +322,20 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         CompletableFuture.supplyAsync(() -> source.getPostImages(current.getId()), ES)
                 .thenAcceptAsync(images -> images.stream().sequential().forEach((image) -> {
                     try {
-                        BufferedImage bufferedImage = ImageIO.read(new URL(image.getRef()));
+                        CompletableFuture.supplyAsync(() -> {
+                            try {
+                                return ImageIO.read(new URL(image.getRef()));
+                            } catch (IOException e) {
+                                return null;
+                            }
+                        }, ES).thenApplyAsync((bufferedImage) ->
+                                Scalr.resize(bufferedImage,
+                                        Scalr.Method.ULTRA_QUALITY,
+                                        Scalr.Mode.AUTOMATIC,
+                                        128, 128), ES)
+                                .thenAcceptAsync((pic) -> SwingUtilities.invokeLater(() ->
+                                        imagesMenu.add(new JLabel(new ImageIcon(pic)))), ES);
                         JLabel pImage = new JLabel();
-                        BufferedImage pic = Scalr.resize(bufferedImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.AUTOMATIC, 128, 128);
-                        imagesMenu.add(new JLabel(new ImageIcon(pic)));
                         JLabel label = new JLabel(Strings.getLastSplitComponent(
                                 URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"));
                         label.setFont(label.getFont().deriveFont(16.0f));
