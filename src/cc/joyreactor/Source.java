@@ -358,4 +358,36 @@ public class Source {
         }
         return tags;
     }
+
+    public Map<String, BigDecimal> getLastMonthTags() {
+        Map<String, BigDecimal> tags = new TreeMap<>();
+        String sql = "SELECT * FROM q_last_month_tags;";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    tags.put(rs.getString(1), rs.getBigDecimal(2).setScale(1));
+                }
+            }
+        } catch (SQLException e) {
+            JXErrorPane.showFrame(e);
+            return tags;
+        }
+        return tags;
+    }
+
+    public Map<String, BigDecimal> getLastYearTags() {
+        Map<String, BigDecimal> tags = new TreeMap<>();
+        String sql = "SELECT * FROM q_last_year_tags;";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    tags.put(rs.getString(1), rs.getBigDecimal(2).setScale(1));
+                }
+            }
+        } catch (SQLException e) {
+            JXErrorPane.showFrame(e);
+            return tags;
+        }
+        return tags;
+    }
 }

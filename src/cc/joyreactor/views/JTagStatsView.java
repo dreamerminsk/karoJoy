@@ -30,6 +30,7 @@ public class JTagStatsView extends JPanel {
         add(getMenu(), BorderLayout.PAGE_START);
         table = new JTable(new TagsModel(new TreeMap<>()));
         table.setAutoCreateColumnsFromModel(true);
+        table.setAutoCreateRowSorter(true);
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
 
@@ -50,6 +51,20 @@ public class JTagStatsView extends JPanel {
                 SwingUtilities.invokeLater(() -> table.setModel(new TagsModel(tags)))));
         group.add(lastWeek);
         panel.add(lastWeek);
+
+        JButton lastMonth = new JButton("last month");
+        lastMonth.addActionListener((e) -> CompletableFuture.supplyAsync(() ->
+                source.getLastMonthTags()).thenAcceptAsync((Map<String, BigDecimal> tags) ->
+                SwingUtilities.invokeLater(() -> table.setModel(new TagsModel(tags)))));
+        group.add(lastMonth);
+        panel.add(lastMonth);
+
+        JButton lastYear = new JButton("last year");
+        lastYear.addActionListener((e) -> CompletableFuture.supplyAsync(() ->
+                source.getLastYearTags()).thenAcceptAsync((Map<String, BigDecimal> tags) ->
+                SwingUtilities.invokeLater(() -> table.setModel(new TagsModel(tags)))));
+        group.add(lastYear);
+        panel.add(lastYear);
 
         lastWeek.doClick();
         return panel;
