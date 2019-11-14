@@ -70,15 +70,6 @@ public class JTagStatsView extends JPanel {
         return panel;
     }
 
-    private void update() {
-        try {
-            Map<String, BigDecimal> tags = Source.getInstance().getThisMonthTags();
-            table.setModel(new TagsModel(tags));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static class TagsModel extends AbstractTableModel {
 
         private final Map<String, BigDecimal> tags;

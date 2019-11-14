@@ -55,7 +55,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
-        tags.stream().limit(4).forEachOrdered(tag -> {
+        tags.stream().limit(16).forEachOrdered(tag -> {
             if (tag.getRef().endsWith("/")) {
                 urlMap.put(tag.getTag(), tag.getRef() + "new");
             } else {
