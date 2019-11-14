@@ -81,6 +81,14 @@ public class JTagStatsView extends JPanel {
             return 2;
         }
 
+        public Class<?> getColumnClass(int columnIndex) {
+            if (columnIndex == 0) {
+                return String.class;
+            } else {
+                return BigDecimal.class;
+            }
+        }
+
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             if (columnIndex == 0) {
