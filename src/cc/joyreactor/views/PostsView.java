@@ -48,6 +48,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private JLabel commentsLabel;
     private JTagStatsView tagStats;
     private JPanel imagesMenu;
+    private JPanel crPanel;
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -216,8 +217,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
         pubLabel = new JLabel();
         pubLabel.setFont(pubLabel.getFont().deriveFont(Font.PLAIN | Font.ITALIC, 16.0f));
-
         JPanel pubPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
         pubPanel.add(jbPrev100);
         pubPanel.add(jbPrev10);
         pubPanel.add(jbPrev);
@@ -232,6 +233,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         comp.add(pubPanel, c);
 
 
+        crPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+
         commentsLabel = new JLabel();
         try (InputStream stream = this.getClass().getResourceAsStream("/cc/joyreactor/icons/instagram-stories-comments-48px.png")) {
             commentsLabel.setIcon(new ImageIcon(ImageIO.read(stream)));
@@ -239,12 +242,6 @@ public class PostsView extends JPanel implements PropertyChangeListener {
             e.printStackTrace();
         }
         commentsLabel.setFont(commentsLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
-        c.gridx = 2;
-        c.gridy = 0;
-        c.insets = new Insets(5, 5, 5, 5);
-        c.weightx = 1.0;
-        c.anchor = GridBagConstraints.EAST;
-        comp.add(commentsLabel, c);
 
         ratingLabel = new JLabel();
         try (InputStream stream = this.getClass().getResourceAsStream("/cc/joyreactor/icons/instagram-stories-rating-48px.png")) {
@@ -253,12 +250,16 @@ public class PostsView extends JPanel implements PropertyChangeListener {
             e.printStackTrace();
         }
         ratingLabel.setFont(ratingLabel.getFont().deriveFont(Font.ITALIC, 32.0f));
-        c.gridx = 3;
+        c.gridx = 2;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
-        c.weightx = 0.0;
+        c.gridwidth = 2;
+        c.weightx = 1.0;
         c.anchor = GridBagConstraints.EAST;
-        comp.add(ratingLabel, c);
+
+        crPanel.add(commentsLabel);
+        crPanel.add(ratingLabel);
+        comp.add(crPanel, c);
 
 
         tagsPanel = new JTagPanel(new ArrayList<>());

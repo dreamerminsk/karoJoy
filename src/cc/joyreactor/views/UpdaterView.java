@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
 
+import static cc.joyreactor.Updater.THREAD_COUNT;
 import static java.lang.String.format;
 
 public class UpdaterView extends JPanel implements PropertyChangeListener {
@@ -79,7 +80,7 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         private java.util.List<String> ts = new ArrayList<>();
 
         public ThreadBoxModel() {
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < THREAD_COUNT; i++) {
                 ts.add((i + 1) + " - " + LocalTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
             }
         }

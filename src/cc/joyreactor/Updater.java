@@ -31,6 +31,8 @@ import static java.time.temporal.ChronoField.*;
 
 public class Updater extends SwingWorker<UpdateStats, String> {
 
+    public static final int THREAD_COUNT = 16;
+
     private final static DateTimeFormatter LOCAL_TIME = new DateTimeFormatterBuilder()
             .appendValue(HOUR_OF_DAY, 2)
             .appendLiteral(':')
@@ -39,7 +41,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
             .appendLiteral(':')
             .appendValue(SECOND_OF_MINUTE, 2)
             .toFormatter();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(8);
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
     private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>();
     private final Source source;
     private final UpdateStats stats;
@@ -55,7 +57,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
-        tags.stream().limit(16).forEachOrdered(tag -> {
+        tags.stream().limit(THREAD_COUNT).forEachOrdered(tag -> {
             if (tag.getRef().endsWith("/")) {
                 urlMap.put(tag.getTag(), tag.getRef() + "new");
             } else {
@@ -66,8 +68,8 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
     @Override
     protected UpdateStats doInBackground() {
-        IntStream.range(0, 8).forEach(i -> scheduler.scheduleWithFixedDelay(this::parsePage,
-                8 * i,
+        IntStream.range(0, THREAD_COUNT).forEach(i -> scheduler.scheduleWithFixedDelay(this::parsePage,
+                THREAD_COUNT * i,
                 ThreadLocalRandom.current().nextInt(8, 16),
                 TimeUnit.SECONDS));
         return stats;

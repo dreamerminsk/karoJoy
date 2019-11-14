@@ -10,6 +10,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
+import static cc.joyreactor.Updater.THREAD_COUNT;
+
 public class UpdateStats {
 
     private final AtomicLong newUsers = new AtomicLong(0);
@@ -20,7 +22,7 @@ public class UpdateStats {
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
     public UpdateStats() {
-        IntStream.range(0, 8).forEach(i -> threads.add(""));
+        IntStream.range(0, THREAD_COUNT).forEach(i -> threads.add(""));
     }
 
     public long incUsers() {
