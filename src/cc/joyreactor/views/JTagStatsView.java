@@ -8,6 +8,7 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 
 public class JTagStatsView extends JPanel {
@@ -27,7 +28,7 @@ public class JTagStatsView extends JPanel {
 
     public void setupUi() {
         add(getMenu(), BorderLayout.PAGE_START);
-        table = new JTable(16, 2);
+        table = new JTable(new TagsModel(new TreeMap<>()));
         table.setAutoCreateColumnsFromModel(true);
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
@@ -85,7 +86,7 @@ public class JTagStatsView extends JPanel {
             if (columnIndex == 0) {
                 return String.class;
             } else {
-                return BigDecimal.class;
+                return Float.class;
             }
         }
 
@@ -94,7 +95,7 @@ public class JTagStatsView extends JPanel {
             if (columnIndex == 0) {
                 return tags.entrySet().stream().skip(rowIndex).map(Map.Entry::getKey).findFirst().orElse("");
             } else if (columnIndex == 1) {
-                return tags.entrySet().stream().skip(rowIndex).map(Map.Entry::getValue).findFirst().orElse(new BigDecimal("0.0"));
+                return tags.entrySet().stream().skip(rowIndex).map(Map.Entry::getValue).findFirst().orElse(new BigDecimal("0.0")).floatValue();
             } else {
                 return "";
             }
