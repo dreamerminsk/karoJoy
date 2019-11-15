@@ -45,7 +45,6 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>();
     private final Source source;
     private final UpdateStats stats;
-    private MetricRegistry metricRegistry = new MetricRegistry();
 
     public Updater(UpdateStats stats) throws SQLException {
         this.stats = stats;
@@ -76,20 +75,12 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     }
 
     private void parsePage() {
-        Timer timer = metricRegistry.timer(Thread.currentThread().getName());
-        Timer.Context context = timer.time();
-        LocalTime start = LocalTime.now();
         Map.Entry<String, String> tagRef;
         if (ThreadLocalRandom.current().nextBoolean()) {
             tagRef = urlMap.pollLastEntry();
         } else {
             tagRef = urlMap.pollFirstEntry();
         }
-        stats.addThread(
-                getThreadNum(Thread.currentThread().getName()),
-                Thread.currentThread().getName() + " - " +
-                        start.format(LOCAL_TIME) + " - " +
-                        tagRef.getKey() + " - " + getPageNum(tagRef.getValue()));
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
             System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getKey() + "' : " + tagRef);
             doc.select("a.next").forEach(next -> System.out.println("\t\t\tNEXT: " + next.attr("abs:href")));
@@ -98,36 +89,6 @@ public class Updater extends SwingWorker<UpdateStats, String> {
             doc.select("div.postContainer").stream().map(this::parsePost)
                     .forEachOrdered(this::update);
         });
-        context.stop();
-        LocalTime finish = LocalTime.now();
-        stats.addThread(
-                getThreadNum(Thread.currentThread().getName()),
-                Thread.currentThread().getName() + " - " +
-                        finish.format(LOCAL_TIME) + " - " + (3600 * timer.getMeanRate()) + " / " + timer.getCount());
-    }
-
-    private String getPageNum(String value) {
-        String[] parts = value.split("/");
-        if (parts.length > 0) {
-            try {
-                return parts[parts.length - 1];
-            } catch (Exception e) {
-                return "---";
-            }
-        }
-        return "---";
-    }
-
-    private int getThreadNum(String name) {
-        String[] parts = name.split("-");
-        if (parts.length > 0) {
-            try {
-                return Integer.parseInt(parts[parts.length - 1]);
-            } catch (Exception e) {
-                return 0;
-            }
-        }
-        return 0;
     }
 
     private void update(Post post) {
