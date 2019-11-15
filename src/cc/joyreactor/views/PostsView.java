@@ -12,9 +12,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
@@ -511,43 +508,5 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
     }
 
-
-    class LineSplittingLabel extends JComponent {
-        private final Font font = new Font(Font.SERIF, Font.PLAIN, 64);
-        private final String text;
-
-        protected LineSplittingLabel(String str) {
-            super();
-            this.text = str;
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            int w = getWidth();
-            int h = getHeight();
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, w, h);
-
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            FontRenderContext frc = g2.getFontRenderContext();
-            Shape shape = new TextLayout(text, font, frc).getOutline(null);
-            Rectangle2D b = shape.getBounds2D();
-            double cx = w / 2d - b.getCenterX();
-            double cy = h / 2d - b.getCenterY();
-            AffineTransform toCenterAtf = AffineTransform.getTranslateInstance(cx, cy);
-
-            Shape s = toCenterAtf.createTransformedShape(shape);
-            g2.setPaint(Color.BLACK);
-            g2.fill(s);
-            Rectangle2D clip = new Rectangle2D.Double(b.getX(), b.getY(), b.getWidth(), b.getHeight() / 2d);
-            g2.setClip(toCenterAtf.createTransformedShape(clip));
-            g2.setPaint(Color.RED);
-            g2.fill(s);
-            g2.dispose();
-        }
-    }
 
 }

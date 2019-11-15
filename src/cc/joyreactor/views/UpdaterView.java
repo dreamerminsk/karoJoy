@@ -184,7 +184,7 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
     }
 
 
-    private static class MessagePopup extends Popup
+    private class MessagePopup extends Popup
             implements WindowFocusListener {
         private final JWindow dialog;
 
@@ -195,7 +195,7 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
             dialog.setLocation(x, y);
 
             JPanel panel = new JPanel(new BorderLayout());
-            JScrollPane jScrollPane = new JScrollPane(new JTable(5, 5));
+            JScrollPane jScrollPane = new JScrollPane(new JTable(UpdaterView.this.stats));
             panel.add(jScrollPane, BorderLayout.CENTER);
             dialog.setContentPane(panel);
             panel.setBorder(new JPopupMenu().getBorder());

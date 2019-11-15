@@ -34,7 +34,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     public Updater(UpdateStats stats) throws SQLException {
         this.stats = stats;
         source = Source.getInstance();
-        urlMap.put("JoyReactor", "http://joyreactor.cc/best");
+        urlMap.put("JoyReactor", "http://joyreactor.cc/new");
         urlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
         urlMap.put("Anime", "http://anime.reactor.cc/new");
         //urlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");

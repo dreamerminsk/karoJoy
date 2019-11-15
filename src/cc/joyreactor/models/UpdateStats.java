@@ -1,27 +1,28 @@
 package cc.joyreactor.models;
 
+import cc.joyreactor.utils.Strings;
+
+import javax.swing.table.AbstractTableModel;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 import static cc.joyreactor.Updater.THREAD_COUNT;
 
-public class UpdateStats {
+public class UpdateStats extends AbstractTableModel {
 
     private final AtomicLong newUsers = new AtomicLong(0);
     private final AtomicLong newPosts = new AtomicLong(0);
     private final AtomicLong newComments = new AtomicLong(0);
     private final AtomicReference<BigDecimal> newRating = new AtomicReference<>(new BigDecimal(0));
     private List<String> threads = new ArrayList<>();
-    
+
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
+    private Map<String, Map.Entry<String, String>> tasks = new TreeMap<String, Map.Entry<String, String>>();
 
     public UpdateStats() {
         IntStream.range(0, THREAD_COUNT).forEach(i -> threads.add(""));
@@ -80,6 +81,32 @@ public class UpdateStats {
     }
 
     public void startTask(Thread currentThread, Map.Entry<String, String> tagRef) {
+        tasks.put(currentThread.getName(), tagRef);
+        fireTableDataChanged();
+    }
+
+    @Override
+    public int getRowCount() {
+        return tasks.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+        return 3;
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        if (columnIndex == 0) {
+            return tasks.keySet().stream().skip(rowIndex).findFirst().orElse("");
+        } else if (columnIndex == 1) {
+            return tasks.values().stream().skip(rowIndex).findFirst().map(Map.Entry::getKey).orElse("");
+        } else if (columnIndex == 2) {
+            return tasks.values().stream().skip(rowIndex).findFirst()
+                    .map(Map.Entry::getValue)
+                    .map(item -> Strings.getLastSplitComponent(item, "/")).orElse("");
+        }
+        return null;
     }
 }
 
