@@ -26,7 +26,6 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
     private final UpdateStats stats;
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
     private final ThreadBoxModel threadBoxModel = new ThreadBoxModel();
-    private final JComboBox<String> threads = new JComboBox<>(threadBoxModel);
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
     private JLabel newUsersLabel;
     private JLabel newCommentsLabel;
@@ -62,10 +61,6 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         newRatingLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
         newRatingLabel.setFont(newRatingLabel.getFont().deriveFont(14.0f));
         add(newRatingLabel);
-
-        threads.setFont(threads.getFont().deriveFont(14.0f));
-        //threads.setPrototypeDisplayValue("XX - XX:XX:XX.XXX - XXXXXXXXXXXXXXXXXXXXXXX - XXXXXX");
-        add(threads);
 
         tasks = new JLabel(" TASKS: 0 ");
         tasks.setBorder(UIManager.getBorder("ScrollPane.border"));

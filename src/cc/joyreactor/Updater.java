@@ -37,6 +37,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         urlMap.put("JoyReactor", "http://joyreactor.cc/new");
         urlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
         urlMap.put("Anime", "http://anime.reactor.cc/new");
+        urlMap.put("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
         //urlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
