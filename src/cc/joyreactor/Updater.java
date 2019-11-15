@@ -37,9 +37,11 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         source = Source.getInstance();
         mainUrlMap.put("JoyReactor", "http://joyreactor.cc/new");
         mainUrlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
-        mainUrlMap.put("Anime", "http://anime.reactor.cc/new");
-        mainUrlMap.put("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
-        mainUrlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
+//        mainUrlMap.put("Anime", "http://anime.reactor.cc/new");
+//        mainUrlMap.put("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
+//        mainUrlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
+        mainUrlMap.put("Архитектура", "http://anime.reactor.cc/tag/Архитектура/new");
+        mainUrlMap.put("Скульптура", "http://anime.reactor.cc/tag/Скульптура/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
