@@ -27,6 +27,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     public static final int THREAD_COUNT = 16;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
+    private final ConcurrentSkipListMap<String, String> mainUrlMap = new ConcurrentSkipListMap<>();
     private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>();
     private final Source source;
     private final UpdateStats stats;
@@ -34,11 +35,11 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     public Updater(UpdateStats stats) throws SQLException {
         this.stats = stats;
         source = Source.getInstance();
-        urlMap.put("JoyReactor", "http://joyreactor.cc/new");
-        urlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
-        urlMap.put("Anime", "http://anime.reactor.cc/new");
-        urlMap.put("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
-        //urlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
+        mainUrlMap.put("JoyReactor", "http://joyreactor.cc/new");
+        mainUrlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
+        mainUrlMap.put("Anime", "http://anime.reactor.cc/new");
+        mainUrlMap.put("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
+        mainUrlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
@@ -63,9 +64,17 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     private void parsePage() {
         Map.Entry<String, String> tagRef;
         if (ThreadLocalRandom.current().nextBoolean()) {
-            tagRef = urlMap.pollLastEntry();
+            if (ThreadLocalRandom.current().nextBoolean()) {
+                tagRef = mainUrlMap.pollLastEntry();
+            } else {
+                tagRef = mainUrlMap.pollFirstEntry();
+            }
         } else {
-            tagRef = urlMap.pollFirstEntry();
+            if (ThreadLocalRandom.current().nextBoolean()) {
+                tagRef = urlMap.pollLastEntry();
+            } else {
+                tagRef = urlMap.pollFirstEntry();
+            }
         }
         stats.startTask(Thread.currentThread(), tagRef);
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
