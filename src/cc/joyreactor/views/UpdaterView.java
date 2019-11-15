@@ -88,11 +88,10 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
                 } while (parent != null);
 
                 Point loc = parent.getLocationOnScreen();
-                MessagePopup mp = new MessagePopup((Frame) parent, "");
+                MessagePopup mp = new MessagePopup((Frame) parent,
+                        loc.x + parent.getWidth() / 3,
+                        loc.y + parent.getHeight() / 3);
                 mp.show();
-//                Popup popup = pf.getPopup(UpdaterView.this.getParent(), panel,
-//                        loc.x + parent.getWidth()/3, loc.y + parent.getHeight() / 3);
-//                popup.show();
             }
 
             @Override
@@ -189,11 +188,11 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
             implements WindowFocusListener {
         private final JWindow dialog;
 
-        public MessagePopup(Frame base, String message) {
+        public MessagePopup(Frame base, int x, int y) {
             super();
             dialog = new JWindow(base);
             dialog.setFocusable(true);
-            //dialog.setLocation(x, y);
+            dialog.setLocation(x, y);
 
             JPanel panel = new JPanel(new BorderLayout());
             JScrollPane jScrollPane = new JScrollPane(new JTable(5, 5));
