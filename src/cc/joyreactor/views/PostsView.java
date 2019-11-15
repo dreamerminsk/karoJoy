@@ -367,7 +367,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                                 Scalr.resize(bufferedImage,
                                         Scalr.Method.ULTRA_QUALITY,
                                         Scalr.Mode.AUTOMATIC,
-                                        128, 128), ES)
+                                        256, 256), ES)
                                 .thenAcceptAsync((pic) -> SwingUtilities.invokeLater(() ->
                                 {
                                     imagesMenu.add(new JLabel(new ImageIcon(pic)));
@@ -393,30 +393,6 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                 .thenAcceptAsync(tags -> SwingUtilities.invokeLater(() -> tagsPanel.setTags(tags)), ES);
 
 
-    }
-
-    private void updatePostImage(JLabel userLabel, BufferedImage img) {
-        BufferedImage logo = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-        for (int i = 0; i < logo.getWidth(); i++) {
-            for (int j = 0; j < logo.getHeight(); j++) {
-                logo.setRGB(i, j, Color.WHITE.getRGB());
-            }
-        }
-        for (int j = 0; j < logo.getHeight(); j++) {
-            for (int i = 0; i < logo.getWidth(); i++) {
-                logo.setRGB(i, j, img.getRGB(i, j));
-            }
-            if (j % 3 == 0) {
-                SwingUtilities.invokeLater(() -> userLabel.setIcon(new ImageIcon(logo)));
-                try {
-                    Thread.sleep(8);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        SwingUtilities.invokeLater(() -> userLabel.setIcon(new ImageIcon(logo)));
     }
 
     private void updateImage(JLabel userLabel, BufferedImage img) {
