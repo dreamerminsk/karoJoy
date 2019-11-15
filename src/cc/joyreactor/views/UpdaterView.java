@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -71,17 +73,10 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         tasks.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JFrame f = new JFrame();
                 JPanel panel = new JPanel(new BorderLayout());
-                f.setLayout(new BorderLayout());
                 JScrollPane jScrollPane = new JScrollPane(new JTable(5, 5));
                 panel.add(jScrollPane, BorderLayout.CENTER);
-                f.add(panel, BorderLayout.CENTER);
 
-                f.setSize(400, 400);
-                f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                f.setLocationRelativeTo(null);
-                f.setVisible(false);
                 PopupFactory pf = PopupFactory.getSharedInstance();
                 Container parent = UpdaterView.this;
                 do {
@@ -91,9 +86,13 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
                     parent = parent.getParent();
 
                 } while (parent != null);
+
                 Point loc = parent.getLocationOnScreen();
-                Popup popup = pf.getPopup(UpdaterView.this.getParent(), panel, loc.x, loc.y + parent.getHeight() / 3);
-                popup.show();
+                MessagePopup mp = new MessagePopup((Frame) parent, "");
+                mp.show();
+//                Popup popup = pf.getPopup(UpdaterView.this.getParent(), panel,
+//                        loc.x + parent.getWidth()/3, loc.y + parent.getHeight() / 3);
+//                popup.show();
             }
 
             @Override
@@ -182,6 +181,46 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         public void update(java.util.List<String> threads) {
             IntStream.range(0, threads.size()).forEach(i -> ts.set(i, threads.get(i)));
             fireContentsChanged(this, 0, threads.size() - 1);
+        }
+    }
+
+
+    private static class MessagePopup extends Popup
+            implements WindowFocusListener {
+        private final JWindow dialog;
+
+        public MessagePopup(Frame base, String message) {
+            super();
+            dialog = new JWindow(base);
+            dialog.setFocusable(true);
+            //dialog.setLocation(x, y);
+
+            JPanel panel = new JPanel(new BorderLayout());
+            JScrollPane jScrollPane = new JScrollPane(new JTable(5, 5));
+            panel.add(jScrollPane, BorderLayout.CENTER);
+            dialog.setContentPane(panel);
+            panel.setBorder(new JPopupMenu().getBorder());
+            dialog.setSize(panel.getPreferredSize());
+        }
+
+        @Override
+        public void show() {
+            dialog.addWindowFocusListener(this);
+            dialog.setVisible(true);
+        }
+
+        @Override
+        public void hide() {
+            dialog.setVisible(false);
+            dialog.removeWindowFocusListener(this);
+        }
+
+        public void windowGainedFocus(WindowEvent e) {
+            // NO-OP
+        }
+
+        public void windowLostFocus(WindowEvent e) {
+            hide();
         }
     }
 }
