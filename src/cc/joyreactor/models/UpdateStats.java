@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
@@ -19,6 +20,7 @@ public class UpdateStats {
     private final AtomicLong newComments = new AtomicLong(0);
     private final AtomicReference<BigDecimal> newRating = new AtomicReference<>(new BigDecimal(0));
     private List<String> threads = new ArrayList<>();
+    
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
     public UpdateStats() {
@@ -77,5 +79,7 @@ public class UpdateStats {
                 Collections.unmodifiableList(threads));
     }
 
+    public void startTask(Thread currentThread, Map.Entry<String, String> tagRef) {
+    }
 }
 

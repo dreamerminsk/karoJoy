@@ -1,15 +1,19 @@
 package cc.joyreactor.views;
 
+import cc.joyreactor.JRViewer;
 import cc.joyreactor.models.UpdateStats;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
 import static cc.joyreactor.Updater.THREAD_COUNT;
@@ -18,13 +22,15 @@ import static java.lang.String.format;
 public class UpdaterView extends JPanel implements PropertyChangeListener {
 
     private final UpdateStats stats;
-    private PropertyChangeSupport changes = new PropertyChangeSupport(this);
+    private final AtomicBoolean isStarted = new AtomicBoolean(false);
     private final ThreadBoxModel threadBoxModel = new ThreadBoxModel();
     private final JComboBox<String> threads = new JComboBox<>(threadBoxModel);
+    private PropertyChangeSupport changes = new PropertyChangeSupport(this);
     private JLabel newUsersLabel;
     private JLabel newCommentsLabel;
     private JLabel newRatingLabel;
     private JLabel newPostsLabel;
+    private JLabel tasks;
 
     public UpdaterView(UpdateStats stats) {
         super(new FlowLayout(FlowLayout.LEFT));
@@ -59,9 +65,66 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         //threads.setPrototypeDisplayValue("XX - XX:XX:XX.XXX - XXXXXXXXXXXXXXXXXXXXXXX - XXXXXX");
         add(threads);
 
+        tasks = new JLabel(" TASKS: 0 ");
+        tasks.setBorder(UIManager.getBorder("ScrollPane.border"));
+        tasks.setFont(tasks.getFont().deriveFont(14.0f));
+        tasks.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JFrame f = new JFrame();
+                JPanel panel = new JPanel(new BorderLayout());
+                f.setLayout(new BorderLayout());
+                JScrollPane jScrollPane = new JScrollPane(new JTable(5, 5));
+                panel.add(jScrollPane, BorderLayout.CENTER);
+                f.add(panel, BorderLayout.CENTER);
+
+                f.setSize(400, 400);
+                f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                f.setLocationRelativeTo(null);
+                f.setVisible(false);
+                PopupFactory pf = PopupFactory.getSharedInstance();
+                Container parent = UpdaterView.this;
+                do {
+                    if (parent instanceof JRViewer) {
+                        break;
+                    }
+                    parent = parent.getParent();
+
+                } while (parent != null);
+                Point loc = parent.getLocationOnScreen();
+                Popup popup = pf.getPopup(UpdaterView.this.getParent(), panel, loc.x, loc.y + parent.getHeight() / 3);
+                popup.show();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+        add(tasks);
+
         JButton startButton = new JButton("START");
         add(startButton);
-        startButton.addActionListener((e) -> changes.firePropertyChange("start", false, true));
+        startButton.addActionListener((e) ->
+        {
+            boolean old = isStarted.getAndSet(!isStarted.get());
+            changes.firePropertyChange("start", old, isStarted.get());
+        });
     }
 
     @Override

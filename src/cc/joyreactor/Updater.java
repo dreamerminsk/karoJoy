@@ -6,19 +6,14 @@ import cc.joyreactor.data.Tag;
 import cc.joyreactor.data.User;
 import cc.joyreactor.models.UpdateStats;
 import ch.caro62.services.WebClient;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
 import org.jsoup.nodes.Element;
 
 import javax.swing.*;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,20 +22,10 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.time.temporal.ChronoField.*;
-
 public class Updater extends SwingWorker<UpdateStats, String> {
 
     public static final int THREAD_COUNT = 16;
 
-    private final static DateTimeFormatter LOCAL_TIME = new DateTimeFormatterBuilder()
-            .appendValue(HOUR_OF_DAY, 2)
-            .appendLiteral(':')
-            .appendValue(MINUTE_OF_HOUR, 2)
-            .optionalStart()
-            .appendLiteral(':')
-            .appendValue(SECOND_OF_MINUTE, 2)
-            .toFormatter();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
     private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>();
     private final Source source;
@@ -81,6 +66,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         } else {
             tagRef = urlMap.pollFirstEntry();
         }
+        stats.startTask(Thread.currentThread(), tagRef);
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
             System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getKey() + "' : " + tagRef);
             doc.select("a.next").forEach(next -> System.out.println("\t\t\tNEXT: " + next.attr("abs:href")));

@@ -35,6 +35,7 @@ public class JRViewer extends JFrame implements PropertyChangeListener {
     public static void main(String... args) throws SQLException, IOException {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            //UIManager.setLookAndFeel(new NimbusLookAndFeel());
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
