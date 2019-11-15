@@ -195,7 +195,9 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
             dialog.setLocation(x, y);
 
             JPanel panel = new JPanel(new BorderLayout());
-            JScrollPane jScrollPane = new JScrollPane(new JTable(UpdaterView.this.stats));
+            JTable jTable = new JTable(UpdaterView.this.stats);
+            jTable.setAutoCreateRowSorter(true);
+            JScrollPane jScrollPane = new JScrollPane(jTable);
             panel.add(jScrollPane, BorderLayout.CENTER);
             dialog.setContentPane(panel);
             panel.setBorder(new JPopupMenu().getBorder());
