@@ -63,24 +63,23 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
     private void parsePage() {
         Map.Entry<String, String> tagRef;
+        ConcurrentSkipListMap<String, String> currentMap = null;
         if (ThreadLocalRandom.current().nextBoolean()) {
-            if (ThreadLocalRandom.current().nextBoolean()) {
-                tagRef = mainUrlMap.pollLastEntry();
-            } else {
-                tagRef = mainUrlMap.pollFirstEntry();
-            }
+            currentMap = mainUrlMap;
         } else {
-            if (ThreadLocalRandom.current().nextBoolean()) {
-                tagRef = urlMap.pollLastEntry();
-            } else {
-                tagRef = urlMap.pollFirstEntry();
-            }
+            currentMap = urlMap;
+        }
+        if (ThreadLocalRandom.current().nextBoolean()) {
+            tagRef = currentMap.pollLastEntry();
+        } else {
+            tagRef = currentMap.pollFirstEntry();
         }
         stats.startTask(Thread.currentThread(), tagRef);
+        ConcurrentSkipListMap<String, String> finalCurrentMap = currentMap;
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
             System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getKey() + "' : " + tagRef);
             doc.select("a.next").forEach(next -> System.out.println("\t\t\tNEXT: " + next.attr("abs:href")));
-            doc.select("a.next").forEach(next -> urlMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
+            doc.select("a.next").forEach(next -> finalCurrentMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
 
             doc.select("div.postContainer").stream().map(this::parsePost)
                     .forEachOrdered(this::update);
