@@ -70,10 +70,6 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         pubs.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JPanel panel = new JPanel(new BorderLayout());
-                JScrollPane jScrollPane = new JScrollPane(new JTable(5, 5));
-                panel.add(jScrollPane, BorderLayout.CENTER);
-
                 PopupFactory pf = PopupFactory.getSharedInstance();
                 Container parent = UpdaterView.this;
                 do {

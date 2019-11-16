@@ -24,13 +24,10 @@ import java.util.stream.IntStream;
 
 public class Updater extends SwingWorker<UpdateStats, String> {
 
-    public static final int THREAD_COUNT = 16;
+    public static final int THREAD_COUNT = 4;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
-    private final ConcurrentSkipListMap<String, String> mainUrlMap = new ConcurrentSkipListMap<>((o1, o2) -> {
-        ThreadLocalRandom r = ThreadLocalRandom.current();
-        return r.nextInt();
-    });
+
     private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>((o1, o2) -> {
         ThreadLocalRandom r = ThreadLocalRandom.current();
         return r.nextInt();
@@ -41,13 +38,13 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     public Updater(UpdateStats stats) throws SQLException {
         this.stats = stats;
         source = Source.getInstance();
-        mainUrlMap.put("JoyReactor", "http://joyreactor.cc/new");
-        mainUrlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
-        mainUrlMap.put("Anime", "http://anime.reactor.cc/new");
-        mainUrlMap.put("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
-        mainUrlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
-        mainUrlMap.put("Nature", "http://joyreactor.cc/tag/Nature/new");
-        mainUrlMap.put("Art", "http://joyreactor.cc/tag/Art/new");
+        urlMap.put("JoyReactor", "http://joyreactor.cc/new");
+        urlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
+        urlMap.put("Anime", "http://anime.reactor.cc/new");
+        urlMap.put("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
+        urlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
+        urlMap.put("Nature", "http://joyreactor.cc/tag/Nature/new");
+        urlMap.put("Art", "http://joyreactor.cc/tag/Art/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
@@ -71,26 +68,19 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
     private void parsePage() {
         Map.Entry<String, String> tagRef;
-        ConcurrentSkipListMap<String, String> currentMap = null;
         if (ThreadLocalRandom.current().nextBoolean()) {
-            currentMap = mainUrlMap;
+            tagRef = urlMap.pollLastEntry();
         } else {
-            currentMap = urlMap;
-        }
-        if (ThreadLocalRandom.current().nextBoolean()) {
-            tagRef = currentMap.pollLastEntry();
-        } else {
-            tagRef = currentMap.pollFirstEntry();
+            tagRef = urlMap.pollFirstEntry();
         }
         stats.startTask(Thread.currentThread(), tagRef);
-        ConcurrentSkipListMap<String, String> finalCurrentMap = currentMap;
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
             System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getKey() + "' : " + tagRef);
             doc.select("a.next").forEach(next -> System.out.println("\t\t\tNEXT: " + next.attr("abs:href")));
-            doc.select("a.next").forEach(next -> finalCurrentMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
+            doc.select("a.next").forEach(next -> urlMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
 
             doc.select("div.postContainer").stream().map(this::parsePost)
-                    .peek(item -> stats.processed(item))
+                    //.peek(item -> stats.processed(item))
                     .forEachOrdered(this::update);
         });
     }
