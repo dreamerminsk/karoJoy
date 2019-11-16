@@ -24,27 +24,25 @@ import java.util.stream.IntStream;
 
 public class Updater extends SwingWorker<UpdateStats, String> {
 
-    public static final int THREAD_COUNT = 4;
+    public static final int THREAD_COUNT = 32;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
 
-    private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>((o1, o2) -> {
-        ThreadLocalRandom r = ThreadLocalRandom.current();
-        return r.nextInt();
-    });
+    private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>();
     private final Source source;
     private final UpdateStats stats;
+    private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
 
     public Updater(UpdateStats stats) throws SQLException {
         this.stats = stats;
         source = Source.getInstance();
-        urlMap.put("JoyReactor", "http://joyreactor.cc/new");
-        urlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
-        urlMap.put("Anime", "http://anime.reactor.cc/new");
-        urlMap.put("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
-        urlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
-        urlMap.put("Nature", "http://joyreactor.cc/tag/Nature/new");
-        urlMap.put("Art", "http://joyreactor.cc/tag/Art/new");
+        randomPut("JoyReactor", "http://joyreactor.cc/new");
+        randomPut("Pleasure Room", "http://pr.reactor.cc/new");
+        randomPut("Anime", "http://anime.reactor.cc/new");
+        randomPut("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
+        randomPut("Эротика", "http://joyreactor.cc/tag/Эротика/new");
+        randomPut("Nature", "http://joyreactor.cc/tag/Nature/new");
+        randomPut("Art", "http://joyreactor.cc/tag/Art/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
@@ -55,6 +53,12 @@ public class Updater extends SwingWorker<UpdateStats, String> {
                 urlMap.put(tag.getTag(), tag.getRef() + "/new");
             }
         });
+    }
+
+    private void randomPut(String key, String value) {
+        if (tlr.nextBoolean()) {
+            urlMap.put(key, value);
+        }
     }
 
     @Override
