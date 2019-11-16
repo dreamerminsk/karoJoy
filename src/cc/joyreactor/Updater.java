@@ -27,8 +27,14 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     public static final int THREAD_COUNT = 16;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
-    private final ConcurrentSkipListMap<String, String> mainUrlMap = new ConcurrentSkipListMap<>();
-    private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>();
+    private final ConcurrentSkipListMap<String, String> mainUrlMap = new ConcurrentSkipListMap<>((o1, o2) -> {
+        ThreadLocalRandom r = ThreadLocalRandom.current();
+        return r.nextInt();
+    });
+    private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>((o1, o2) -> {
+        ThreadLocalRandom r = ThreadLocalRandom.current();
+        return r.nextInt();
+    });
     private final Source source;
     private final UpdateStats stats;
 
@@ -37,11 +43,11 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         source = Source.getInstance();
         mainUrlMap.put("JoyReactor", "http://joyreactor.cc/new");
         mainUrlMap.put("Pleasure Room", "http://pr.reactor.cc/new");
-//        mainUrlMap.put("Anime", "http://anime.reactor.cc/new");
-//        mainUrlMap.put("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
-//        mainUrlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
-        mainUrlMap.put("Архитектура", "http://anime.reactor.cc/tag/Архитектура/new");
-        mainUrlMap.put("Скульптура", "http://anime.reactor.cc/tag/Скульптура/new");
+        mainUrlMap.put("Anime", "http://anime.reactor.cc/new");
+        mainUrlMap.put("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
+        mainUrlMap.put("Эротика", "http://joyreactor.cc/tag/Эротика/new");
+        mainUrlMap.put("Nature", "http://joyreactor.cc/tag/Nature/new");
+        mainUrlMap.put("Art", "http://joyreactor.cc/tag/Art/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 

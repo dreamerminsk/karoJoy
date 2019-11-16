@@ -7,6 +7,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
@@ -22,7 +23,8 @@ public class UpdateStats extends AbstractTableModel {
     private List<String> threads = new ArrayList<>();
 
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
-    private Map<String, Map.Entry<String, String>> tasks = new TreeMap<String, Map.Entry<String, String>>();
+    private ConcurrentSkipListMap<Thread, Map.Entry<String, String>> tasks = new ConcurrentSkipListMap<>(
+            Comparator.comparing(Thread::getName));
 
     public UpdateStats() {
         IntStream.range(0, THREAD_COUNT).forEach(i -> threads.add(""));
@@ -81,7 +83,7 @@ public class UpdateStats extends AbstractTableModel {
     }
 
     public void startTask(Thread currentThread, Map.Entry<String, String> tagRef) {
-        tasks.put(currentThread.getName(), tagRef);
+        tasks.put(currentThread, tagRef);
         fireTableDataChanged();
     }
 
@@ -92,19 +94,21 @@ public class UpdateStats extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 3;
+        return 4;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
-            return tasks.keySet().stream().skip(rowIndex).findFirst().orElse("");
+            return tasks.keySet().stream().skip(rowIndex).map(Thread::getName).findFirst().orElse("");
         } else if (columnIndex == 1) {
             return tasks.values().stream().skip(rowIndex).findFirst().map(Map.Entry::getKey).orElse("");
         } else if (columnIndex == 2) {
             return tasks.values().stream().skip(rowIndex).findFirst()
                     .map(Map.Entry::getValue)
                     .map(item -> Strings.getLastSplitComponent(item, "/")).orElse("");
+        } else if (columnIndex == 3) {
+            return tasks.keySet().stream().skip(rowIndex).map(Thread::getState).map(Enum::toString).findFirst().orElse("");
         }
         return null;
     }
