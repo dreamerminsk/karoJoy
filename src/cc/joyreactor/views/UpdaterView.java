@@ -4,9 +4,10 @@ import cc.joyreactor.JRViewer;
 import cc.joyreactor.models.UpdateStats;
 
 import javax.swing.*;
+import javax.swing.table.TableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.beans.PropertyChangeEvent;
@@ -32,6 +33,7 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
     private JLabel newRatingLabel;
     private JLabel newPostsLabel;
     private JLabel tasks;
+    private JLabel pubs;
 
     public UpdaterView(UpdateStats stats) {
         super(new FlowLayout(FlowLayout.LEFT));
@@ -62,10 +64,40 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         newRatingLabel.setFont(newRatingLabel.getFont().deriveFont(14.0f));
         add(newRatingLabel);
 
+        pubs = new JLabel(" PUBLISHED: 0 ");
+        pubs.setBorder(UIManager.getBorder("ScrollPane.border"));
+        pubs.setFont(pubs.getFont().deriveFont(14.0f));
+        pubs.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JPanel panel = new JPanel(new BorderLayout());
+                JScrollPane jScrollPane = new JScrollPane(new JTable(5, 5));
+                panel.add(jScrollPane, BorderLayout.CENTER);
+
+                PopupFactory pf = PopupFactory.getSharedInstance();
+                Container parent = UpdaterView.this;
+                do {
+                    if (parent instanceof JRViewer) {
+                        break;
+                    }
+                    parent = parent.getParent();
+
+                } while (parent != null);
+
+                Point loc = parent.getLocationOnScreen();
+//                MessagePopup mp = new MessagePopup((Frame) parent,
+//                        stats.getPubTableModel(),
+//                        loc.x + parent.getWidth() / 3,
+//                        loc.y + parent.getHeight() / 3);
+//                mp.show();
+            }
+        });
+        add(pubs);
+
         tasks = new JLabel(" TASKS: 0 ");
         tasks.setBorder(UIManager.getBorder("ScrollPane.border"));
         tasks.setFont(tasks.getFont().deriveFont(14.0f));
-        tasks.addMouseListener(new MouseListener() {
+        tasks.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 JPanel panel = new JPanel(new BorderLayout());
@@ -84,29 +116,10 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
 
                 Point loc = parent.getLocationOnScreen();
                 MessagePopup mp = new MessagePopup((Frame) parent,
+                        stats,
                         loc.x + parent.getWidth() / 3,
                         loc.y + parent.getHeight() / 3);
                 mp.show();
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
             }
         });
         add(tasks);
@@ -183,14 +196,14 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
             implements WindowFocusListener {
         private final JWindow dialog;
 
-        public MessagePopup(Frame base, int x, int y) {
+        public MessagePopup(Frame base, TableModel tm, int x, int y) {
             super();
             dialog = new JWindow(base);
             dialog.setFocusable(true);
             dialog.setLocation(x, y);
 
             JPanel panel = new JPanel(new BorderLayout());
-            JTable jTable = new JTable(UpdaterView.this.stats);
+            JTable jTable = new JTable(tm);
             jTable.setAutoCreateRowSorter(true);
             JScrollPane jScrollPane = new JScrollPane(jTable);
             panel.add(jScrollPane, BorderLayout.CENTER);

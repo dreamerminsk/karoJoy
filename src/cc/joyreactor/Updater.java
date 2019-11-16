@@ -90,6 +90,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
             doc.select("a.next").forEach(next -> finalCurrentMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
 
             doc.select("div.postContainer").stream().map(this::parsePost)
+                    .peek(item -> stats.processed(item))
                     .forEachOrdered(this::update);
         });
     }

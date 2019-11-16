@@ -1,12 +1,18 @@
 package cc.joyreactor.models;
 
+import cc.joyreactor.data.Post;
 import cc.joyreactor.utils.Strings;
 
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.math.BigDecimal;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,6 +31,28 @@ public class UpdateStats extends AbstractTableModel {
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
     private ConcurrentSkipListMap<Thread, Map.Entry<String, String>> tasks = new ConcurrentSkipListMap<>(
             Comparator.comparing(Thread::getName));
+    private ConcurrentSkipListMap<LocalDate, Long> pubs = new ConcurrentSkipListMap<>();
+    private AbstractTableModel pubTableModel = new AbstractTableModel() {
+        @Override
+        public int getRowCount() {
+            return pubs.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 2;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            if (columnIndex == 0) {
+                return pubs.keySet().stream().skip(rowIndex).findFirst().orElse(LocalDate.MIN);
+            } else if (columnIndex == 1) {
+                return pubs.values().stream().skip(rowIndex).findFirst().orElse(0L);
+            }
+            return null;
+        }
+    };
 
     public UpdateStats() {
         IntStream.range(0, THREAD_COUNT).forEach(i -> threads.add(""));
@@ -74,14 +102,6 @@ public class UpdateStats extends AbstractTableModel {
         changes.removePropertyChangeListener(l);
     }
 
-    public void addThread(int index, String thread) {
-        if (index == 0) return;
-        threads.set(index - 1, thread);
-        changes.firePropertyChange("threads",
-                index,
-                Collections.unmodifiableList(threads));
-    }
-
     public void startTask(Thread currentThread, Map.Entry<String, String> tagRef) {
         tasks.put(currentThread, tagRef);
         fireTableDataChanged();
@@ -111,6 +131,19 @@ public class UpdateStats extends AbstractTableModel {
             return tasks.keySet().stream().skip(rowIndex).map(Thread::getState).map(Enum::toString).findFirst().orElse("");
         }
         return null;
+    }
+
+    public void processed(Post item) {
+        if (pubs.containsKey(item.getPublished().toLocalDate())) {
+            pubs.put(item.getPublished().toLocalDate(), pubs.get(item.getPublished().toLocalDate()) + 1);
+        } else {
+            pubs.put(item.getPublished().toLocalDate(), 1L);
+        }
+        pubTableModel.fireTableDataChanged();
+    }
+
+    public TableModel getPubTableModel() {
+        return pubTableModel;
     }
 }
 
