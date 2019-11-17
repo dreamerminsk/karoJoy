@@ -40,7 +40,7 @@ public class Source {
 
     public List<Tag> getTags() {
         List<Tag> tags = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM jr_tags;")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM jr_tags WHERE ids LIKE '%,%';")) {
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     tags.add(new Tag(
@@ -86,9 +86,9 @@ public class Source {
             statement.setString(1, tag.getTag());
             statement.setString(2, tag.getRef());
             statement.setString(3, tag.getIds());
-            statement.setInt(6, tag.getId());
             statement.setBytes(4, tag.getAvatar());
             statement.setBytes(5, tag.getBanner());
+            statement.setInt(6, tag.getId());
             return statement.executeUpdate();
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);

@@ -36,17 +36,17 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     public Updater(UpdateStats stats) throws SQLException {
         this.stats = stats;
         source = Source.getInstance();
-        randomPut("JoyReactor", "http://joyreactor.cc/new");
-        randomPut("Pleasure Room", "http://pr.reactor.cc/new");
-        randomPut("Anime", "http://anime.reactor.cc/new");
-        randomPut("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
-        randomPut("Эротика", "http://joyreactor.cc/tag/Эротика/new");
-        randomPut("Nature", "http://joyreactor.cc/tag/Nature/new");
-        randomPut("Art", "http://joyreactor.cc/tag/Art/new");
+        //randomPut("JoyReactor", "http://joyreactor.cc/new");
+        urlMap.putIfAbsent("Pleasure Room", "http://pr.reactor.cc/new");
+        //randomPut("Anime", "http://anime.reactor.cc/new");
+        //randomPut("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
+        //randomPut("Эротика", "http://joyreactor.cc/tag/Эротика/new");
+        urlMap.putIfAbsent("Nature", "http://joyreactor.cc/tag/Nature/new");
+        urlMap.putIfAbsent("Art", "http://joyreactor.cc/tag/Art/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
-        tags.stream().limit(THREAD_COUNT).forEachOrdered(tag -> {
+        tags.stream().limit(0).forEachOrdered(tag -> {
             if (tag.getRef().endsWith("/")) {
                 urlMap.put(tag.getTag(), tag.getRef() + "new");
             } else {
@@ -83,8 +83,11 @@ public class Updater extends SwingWorker<UpdateStats, String> {
             System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getKey() + "' : " + tagRef);
 
             Tag tag = source.getTag(tagRef.getKey());
-            if (tag.getAvatar() == null || tag.getBanner() == null) {
+            if (tag.getAvatar() == null) {
                 tag.setAvatar(parseTagAvatar(doc));
+                source.updateTag(tag);
+            }
+            if (tag.getBanner() == null) {
                 tag.setBanner(parseTagBanner(doc));
                 source.updateTag(tag);
             }
