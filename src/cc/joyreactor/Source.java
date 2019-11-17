@@ -40,7 +40,7 @@ public class Source {
 
     public List<Tag> getTags() {
         List<Tag> tags = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM jr_tags WHERE ids LIKE '%,%';")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM jr_tags;")) {
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     tags.add(new Tag(
