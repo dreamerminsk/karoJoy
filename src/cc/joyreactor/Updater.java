@@ -78,8 +78,17 @@ public class Updater extends SwingWorker<UpdateStats, String> {
             tagRef = urlMap.pollFirstEntry();
         }
         stats.startTask(Thread.currentThread(), tagRef);
+
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
             System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getKey() + "' : " + tagRef);
+
+            Tag tag = source.getTag(tagRef.getKey());
+            if (tag.getAvatar() == null || tag.getBanner() == null) {
+                tag.setAvatar(parseTagAvatar(doc));
+                tag.setBanner(parseTagBanner(doc));
+                source.updateTag(tag);
+            }
+
             doc.select("a.next").forEach(next -> System.out.println("\t\t\tNEXT: " + next.attr("abs:href")));
             doc.select("a.next").forEach(next -> urlMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
 
@@ -205,9 +214,15 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         return tags;
     }
 
-    private byte[] parseTagBanner(Element post) {
+    private byte[] parseTagAvatar(Element post) {
         byte[] bytes = new byte[0];
         return post.select("#blogHeader img.blog_avatar[src]").stream()
+                .map(img -> WebClient.getBytesSync(img.attr("abs:src")).get()).findFirst().orElse(bytes);
+    }
+
+    private byte[] parseTagBanner(Element post) {
+        byte[] bytes = new byte[0];
+        return post.select("#tagArticle img.contentInnerHeader[src]").stream()
                 .map(img -> WebClient.getBytesSync(img.attr("abs:src")).get()).findFirst().orElse(bytes);
     }
 

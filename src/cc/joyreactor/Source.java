@@ -86,9 +86,9 @@ public class Source {
             statement.setString(1, tag.getTag());
             statement.setString(2, tag.getRef());
             statement.setString(3, tag.getIds());
-            statement.setInt(4, tag.getId());
-            statement.setBytes(5, tag.getAvatar());
-            statement.setBytes(6, tag.getBanner());
+            statement.setInt(6, tag.getId());
+            statement.setBytes(4, tag.getAvatar());
+            statement.setBytes(5, tag.getBanner());
             return statement.executeUpdate();
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);
