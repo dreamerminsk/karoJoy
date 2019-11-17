@@ -47,7 +47,9 @@ public class Source {
                             rs.getInt("tag_id"),
                             rs.getString("tag"),
                             rs.getString("ref"),
-                            rs.getString("ids")));
+                            rs.getString("ids"),
+                            rs.getBytes("tag_avatar"),
+                            rs.getBytes("tag_banner")));
                 }
             }
         } catch (SQLException ex) {
@@ -66,7 +68,9 @@ public class Source {
                             rs.getInt("tag_id"),
                             rs.getString("tag"),
                             rs.getString("ref"),
-                            rs.getString("ids"));
+                            rs.getString("ids"),
+                            rs.getBytes("tag_avatar"),
+                            rs.getBytes("tag_banner"));
                 }
             }
         } catch (SQLException ex) {
@@ -78,11 +82,13 @@ public class Source {
 
     public int updateTag(Tag tag) {
         try (PreparedStatement statement = connection.prepareStatement(
-                "UPDATE jr_tags SET tag=?, ref=?, ids=? WHERE tag_id=?")) {
+                "UPDATE jr_tags SET tag=?, ref=?, ids=?, tag_avatar=?, tag_banner=? WHERE tag_id=?")) {
             statement.setString(1, tag.getTag());
             statement.setString(2, tag.getRef());
             statement.setString(3, tag.getIds());
             statement.setInt(4, tag.getId());
+            statement.setBytes(5, tag.getAvatar());
+            statement.setBytes(6, tag.getBanner());
             return statement.executeUpdate();
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);
@@ -92,10 +98,12 @@ public class Source {
 
     public int insertTag(Tag tag) {
         try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO jr_tags(tag, ref, ids) VALUES(?, ?, ?)")) {
+                "INSERT INTO jr_tags(tag, ref, ids, tag_avatar, tag_banner) VALUES(?, ?, ?, ?, ?)")) {
             statement.setString(1, tag.getTag());
             statement.setString(2, tag.getRef());
             statement.setString(3, tag.getIds());
+            statement.setBytes(4, tag.getAvatar());
+            statement.setBytes(5, tag.getBanner());
             return statement.executeUpdate();
         } catch (SQLException ex) {
             JXErrorPane.showDialog(ex);

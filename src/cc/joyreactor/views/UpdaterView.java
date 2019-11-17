@@ -81,11 +81,11 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
                 } while (parent != null);
 
                 Point loc = parent.getLocationOnScreen();
-//                MessagePopup mp = new MessagePopup((Frame) parent,
-//                        stats.getPubTableModel(),
-//                        loc.x + parent.getWidth() / 3,
-//                        loc.y + parent.getHeight() / 3);
-//                mp.show();
+                MessagePopup mp = new MessagePopup((Frame) parent,
+                        stats.getPubTableModel(),
+                        loc.x + parent.getWidth() / 3,
+                        loc.y + parent.getHeight() / 3);
+                mp.show();
             }
         });
         add(pubs);

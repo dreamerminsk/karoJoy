@@ -84,7 +84,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
             doc.select("a.next").forEach(next -> urlMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
 
             doc.select("div.postContainer").stream().map(this::parsePost)
-                    //.peek(item -> stats.processed(item))
+                    .peek(stats::processed)
                     .forEachOrdered(this::update);
         });
     }
@@ -195,6 +195,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
                         tag.attr("title"),
                         tag.attr("abs:href"),
                         tag.attr("data-ids")));
+
                 tags.add(source.getTag(tag.attr("title")));
             } else {
                 tags.add(dbTag);
@@ -202,6 +203,12 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         });
 
         return tags;
+    }
+
+    private byte[] parseTagBanner(Element post) {
+        byte[] bytes = new byte[0];
+        return post.select("#blogHeader img.blog_avatar[src]").stream()
+                .map(img -> WebClient.getBytesSync(img.attr("abs:src")).get()).findFirst().orElse(bytes);
     }
 
 }
