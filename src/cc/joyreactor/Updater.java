@@ -14,19 +14,21 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Updater extends SwingWorker<UpdateStats, String> {
 
-    public static final int THREAD_COUNT = 8;
+    public static final int THREAD_COUNT = 16;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
 
-    private final ConcurrentSkipListMap<Instant, String> urlMap = new ConcurrentSkipListMap<>(
-            Comparator.comparingInt(Instant::getNano));
+    private final static ConcurrentSkipListMap<Instant, String> urlMap = new ConcurrentSkipListMap<>();
     private final Source source;
     private final UpdateStats stats;
     private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
