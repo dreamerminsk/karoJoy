@@ -65,7 +65,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     }
 
     private void parsePage() {
-        Map.Entry<Instant, String> tagRef = urlMap.pollFirstEntry();
+        Map.Entry<Instant, String> tagRef = urlMap.pollLastEntry();
 
 
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {

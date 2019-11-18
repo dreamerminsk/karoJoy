@@ -3,18 +3,21 @@ package cc.joyreactor.models;
 import cc.joyreactor.data.Post;
 import cc.joyreactor.utils.Integers;
 import cc.joyreactor.utils.Strings;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.time.ZoneId;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
@@ -27,11 +30,8 @@ public class UpdateStats extends AbstractTableModel {
     private final AtomicLong newPosts = new AtomicLong(0);
     private final AtomicLong newComments = new AtomicLong(0);
     private final AtomicReference<BigDecimal> newRating = new AtomicReference<>(new BigDecimal(0));
-    private List<String> threads = new ArrayList<>();
-
+    private ScheduledExecutorService SES = Executors.newScheduledThreadPool(1);
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
-    private ConcurrentSkipListMap<Thread, String> tasks = new ConcurrentSkipListMap<>(
-            Comparator.comparing(Thread::getName));
 
     private ConcurrentSkipListMap<Integer, Thread> threadList = new ConcurrentSkipListMap<>();
     private ConcurrentSkipListMap<Integer, Instant> startedList = new ConcurrentSkipListMap<>();
@@ -59,11 +59,23 @@ public class UpdateStats extends AbstractTableModel {
             }
             return null;
         }
+
     };
 
 
     public UpdateStats() {
-        IntStream.range(0, THREAD_COUNT).forEach(i -> threads.add(""));
+        IntStream.range(0, THREAD_COUNT).forEach(i -> {
+            threadList.put(i + 1, Thread.currentThread());
+            startedList.put(i + 1, Instant.now());
+            refList.put(i + 1, "");
+            tagList.put(i + 1, "");
+        });
+        SES.scheduleAtFixedRate(() -> {
+            IntStream.range(0, THREAD_COUNT).forEach(i -> {
+                fireTableCellUpdated(i, 3);
+                fireTableCellUpdated(i, 4);
+            });
+        }, 768, 768, TimeUnit.MILLISECONDS);
     }
 
     public long incUsers() {
@@ -126,19 +138,24 @@ public class UpdateStats extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 5;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
-            return threadList.get(rowIndex);
+            return threadList.get(rowIndex + 1).getName();
         } else if (columnIndex == 1) {
-            return tagList.get(rowIndex);
+            return tagList.get(rowIndex + 1);
         } else if (columnIndex == 2) {
-            return Strings.getLastSplitComponent(refList.get(rowIndex), "/");
+            return Strings.getLastSplitComponent(refList.get(rowIndex + 1), "/");
         } else if (columnIndex == 3) {
-            return threadList.get(rowIndex).getState();
+            return threadList.get(rowIndex + 1).getState();
+        } else if (columnIndex == 4) {
+            return DurationFormatUtils.formatDuration(
+                    Duration.between(startedList.get(rowIndex + 1).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                            Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime()).toMillis(),
+                    "**HH:mm:ss**", true);
         }
         return null;
     }
