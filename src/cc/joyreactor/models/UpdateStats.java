@@ -65,10 +65,10 @@ public class UpdateStats extends AbstractTableModel {
 
     public UpdateStats() {
         IntStream.range(0, THREAD_COUNT).forEach(i -> {
-            threadList.put(i + 1, Thread.currentThread());
-            startedList.put(i + 1, Instant.now());
-            refList.put(i + 1, "");
-            tagList.put(i + 1, "");
+            threadList.put(i, Thread.currentThread());
+            startedList.put(i, Instant.now());
+            refList.put(i, "");
+            tagList.put(i, "");
         });
         SES.scheduleAtFixedRate(() -> {
             IntStream.range(0, THREAD_COUNT).forEach(i -> {
@@ -144,16 +144,16 @@ public class UpdateStats extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
-            return threadList.get(rowIndex + 1).getName();
+            return threadList.get(rowIndex).getName();
         } else if (columnIndex == 1) {
-            return tagList.get(rowIndex + 1);
+            return tagList.get(rowIndex);
         } else if (columnIndex == 2) {
-            return Strings.getLastSplitComponent(refList.get(rowIndex + 1), "/");
+            return Strings.getLastSplitComponent(refList.get(rowIndex), "/");
         } else if (columnIndex == 3) {
-            return threadList.get(rowIndex + 1).getState();
+            return threadList.get(rowIndex).getState();
         } else if (columnIndex == 4) {
             return DurationFormatUtils.formatDuration(
-                    Duration.between(startedList.get(rowIndex + 1).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                    Duration.between(startedList.get(rowIndex).atZone(ZoneId.systemDefault()).toLocalDateTime(),
                             Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime()).toMillis(),
                     "**HH:mm:ss**", true);
         }

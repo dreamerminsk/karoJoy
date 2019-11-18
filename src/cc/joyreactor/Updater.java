@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
 
 public class Updater extends SwingWorker<UpdateStats, String> {
 
-    public static final int THREAD_COUNT = 32;
+    public static final int THREAD_COUNT = 8;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
 
@@ -65,9 +65,12 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     }
 
     private void parsePage() {
-        Map.Entry<Instant, String> tagRef = urlMap.pollLastEntry();
-
-
+        Map.Entry<Instant, String> tagRef;
+        if (ThreadLocalRandom.current().nextBoolean()) {
+            tagRef = urlMap.pollFirstEntry();
+        } else {
+            tagRef = urlMap.pollLastEntry();
+        }
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
             stats.startTask(Thread.currentThread(), tagRef.getKey(), tagRef.getValue(), parseTagString(doc));
             System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + parseTagString(doc) + "' : " + tagRef);
