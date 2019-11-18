@@ -28,7 +28,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
 
-    private final ConcurrentSkipListMap<String, String> urlMap = new ConcurrentSkipListMap<>();
+    private final ConcurrentSkipListMap<Instant, String> urlMap = new ConcurrentSkipListMap<>();
     private final Source source;
     private final UpdateStats stats;
     private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
@@ -36,29 +36,23 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     public Updater(UpdateStats stats) throws SQLException {
         this.stats = stats;
         source = Source.getInstance();
-        //randomPut("JoyReactor", "http://joyreactor.cc/new");
-        urlMap.putIfAbsent("Pleasure Room", "http://pr.reactor.cc/new");
-        //randomPut("Anime", "http://anime.reactor.cc/new");
-        //randomPut("Anime Ero", "http://anime.reactor.cc/tag/Anime Ero/new");
-        //randomPut("Эротика", "http://joyreactor.cc/tag/Эротика/new");
-        urlMap.putIfAbsent("Nature", "http://joyreactor.cc/tag/Nature/new");
-        urlMap.putIfAbsent("Art", "http://joyreactor.cc/tag/Art/new");
+        urlMap.put(Instant.now(), "http://joyreactor.cc/new");
+        urlMap.put(Instant.now(), "http://pr.reactor.cc/new");
+        urlMap.put(Instant.now(), "http://anime.reactor.cc/new");
+        urlMap.put(Instant.now(), "http://anime.reactor.cc/tag/Anime Ero/new");
+        urlMap.put(Instant.now(), "http://joyreactor.cc/tag/Эротика/new");
+        urlMap.put(Instant.now(), "http://joyreactor.cc/tag/Nature/new");
+        urlMap.put(Instant.now(), "http://joyreactor.cc/tag/Art/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
-        tags.stream().limit(0).forEachOrdered(tag -> {
+        tags.stream().limit(THREAD_COUNT).forEachOrdered(tag -> {
             if (tag.getRef().endsWith("/")) {
-                urlMap.put(tag.getTag(), tag.getRef() + "new");
+                urlMap.put(Instant.now(), tag.getRef() + "new");
             } else {
-                urlMap.put(tag.getTag(), tag.getRef() + "/new");
+                urlMap.put(Instant.now(), tag.getRef() + "/new");
             }
         });
-    }
-
-    private void randomPut(String key, String value) {
-        if (tlr.nextBoolean()) {
-            urlMap.put(key, value);
-        }
     }
 
     @Override
@@ -71,18 +65,14 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     }
 
     private void parsePage() {
-        Map.Entry<String, String> tagRef;
-        if (ThreadLocalRandom.current().nextBoolean()) {
-            tagRef = urlMap.pollLastEntry();
-        } else {
-            tagRef = urlMap.pollFirstEntry();
-        }
-        stats.startTask(Thread.currentThread(), tagRef);
+        Map.Entry<Instant, String> tagRef = urlMap.pollFirstEntry();
+
 
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
-            System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getKey() + "' : " + tagRef);
+            stats.startTask(Thread.currentThread(), tagRef.getKey(), tagRef.getValue(), parseTagString(doc));
+            System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + parseTagString(doc) + "' : " + tagRef);
 
-            Tag tag = source.getTag(tagRef.getKey());
+            Tag tag = source.getTag(parseTagString(doc));
             if (tag.getAvatar() == null) {
                 tag.setAvatar(parseTagAvatar(doc));
                 source.updateTag(tag);
@@ -92,8 +82,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
                 source.updateTag(tag);
             }
 
-            doc.select("a.next").forEach(next -> System.out.println("\t\t\tNEXT: " + next.attr("abs:href")));
-            doc.select("a.next").forEach(next -> urlMap.putIfAbsent(tagRef.getKey(), next.attr("abs:href")));
+            doc.select("a.next").forEach(next -> urlMap.putIfAbsent(Instant.now(), next.attr("abs:href")));
 
             doc.select("div.postContainer").stream().map(this::parsePost)
                     .peek(stats::processed)
@@ -119,6 +108,11 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         if (source.getPostImages(post.getId()).size() == 0) {
             source.setPostImages(post.getId(), post.getImages());
         }
+    }
+
+    private String parseTagString(Element post) {
+        return post.select("div#blogName h1").stream()
+                .map(Element::text).findFirst().orElse("");
     }
 
     private Post parsePost(Element post) {
