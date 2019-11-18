@@ -14,10 +14,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -28,7 +25,8 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
 
-    private final ConcurrentSkipListMap<Instant, String> urlMap = new ConcurrentSkipListMap<>();
+    private final ConcurrentSkipListMap<Instant, String> urlMap = new ConcurrentSkipListMap<>(
+            Comparator.comparingInt(Instant::getNano));
     private final Source source;
     private final UpdateStats stats;
     private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
@@ -36,21 +34,21 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     public Updater(UpdateStats stats) throws SQLException {
         this.stats = stats;
         source = Source.getInstance();
-        urlMap.put(Instant.now(), "http://joyreactor.cc/new");
-        urlMap.put(Instant.now(), "http://pr.reactor.cc/new");
-        urlMap.put(Instant.now(), "http://anime.reactor.cc/new");
-        urlMap.put(Instant.now(), "http://anime.reactor.cc/tag/Anime Ero/new");
-        urlMap.put(Instant.now(), "http://joyreactor.cc/tag/Эротика/new");
-        urlMap.put(Instant.now(), "http://joyreactor.cc/tag/Nature/new");
-        urlMap.put(Instant.now(), "http://joyreactor.cc/tag/Art/new");
+        urlMap.put(Instant.now().minusSeconds(10), "http://joyreactor.cc/new");
+        urlMap.put(Instant.now().minusSeconds(20), "http://pr.reactor.cc/new");
+        urlMap.put(Instant.now().minusSeconds(30), "http://anime.reactor.cc/new");
+        urlMap.put(Instant.now().minusSeconds(40), "http://anime.reactor.cc/tag/Anime Ero/new");
+        urlMap.put(Instant.now().minusSeconds(50), "http://joyreactor.cc/tag/Эротика/new");
+        urlMap.put(Instant.now().minusSeconds(60), "http://joyreactor.cc/tag/Nature/new");
+        urlMap.put(Instant.now().minusSeconds(70), "http://joyreactor.cc/tag/Art/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
         tags.stream().limit(THREAD_COUNT).forEachOrdered(tag -> {
             if (tag.getRef().endsWith("/")) {
-                urlMap.put(Instant.now(), tag.getRef() + "new");
+                urlMap.put(Instant.now().minusSeconds(tlr.nextInt(0, 60)), tag.getRef() + "new");
             } else {
-                urlMap.put(Instant.now(), tag.getRef() + "/new");
+                urlMap.put(Instant.now().minusSeconds(tlr.nextInt(0, 60)), tag.getRef() + "/new");
             }
         });
     }
@@ -66,7 +64,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
     private void parsePage() {
         Map.Entry<Instant, String> tagRef;
-        if (ThreadLocalRandom.current().nextBoolean()) {
+        if (tlr.nextBoolean()) {
             tagRef = urlMap.pollFirstEntry();
         } else {
             tagRef = urlMap.pollLastEntry();
