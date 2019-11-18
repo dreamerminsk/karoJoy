@@ -124,11 +124,11 @@ public class UpdateStats extends AbstractTableModel {
 
     public void startTask(Thread currentThread, Instant started, String ref, String tag) {
         int row = Integers.of(Strings.getLastSplitComponent(currentThread.getName(), "-"), 0);
-        threadList.put(row, currentThread);
-        startedList.put(row, started);
-        refList.put(row, ref);
-        tagList.put(row, tag);
-        fireTableRowsUpdated(row, row);
+        threadList.put(row - 1, currentThread);
+        startedList.put(row - 1, started);
+        refList.put(row - 1, ref);
+        tagList.put(row - 1, tag);
+        fireTableRowsUpdated(row - 1, row - 1);
     }
 
     @Override
