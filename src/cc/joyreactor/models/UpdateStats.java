@@ -15,12 +15,15 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static cc.joyreactor.Updater.THREAD_COUNT;
@@ -53,11 +56,12 @@ public class UpdateStats extends AbstractTableModel {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            LocalDate day = pubs.elementSet().stream().skip(rowIndex).findFirst().orElse(LocalDate.MIN);
+            List<LocalDate> sortPubs = pubs.elementSet().stream().sorted().collect(Collectors.toList());
+            Collections.reverse(sortPubs);
             if (columnIndex == 0) {
-                return day;
+                return sortPubs.get(rowIndex);
             } else if (columnIndex == 1) {
-                return pubs.count(day);
+                return pubs.count(sortPubs.get(rowIndex));
             }
             return null;
         }
@@ -164,7 +168,12 @@ public class UpdateStats extends AbstractTableModel {
 
     public void processed(Post item) {
         pubs.add(item.getPublished().toLocalDate());
-        pubTableModel.fireTableDataChanged();
+        List<LocalDate> sortPubs = pubs.elementSet().stream().sorted().collect(Collectors.toList());
+        Collections.reverse(sortPubs);
+        IntStream.range(0, sortPubs.size())
+                .filter(i -> sortPubs.get(i).compareTo(item.getPublished().toLocalDate()) == 0)
+                .forEachOrdered(i -> pubTableModel.fireTableRowsUpdated(i, i));
+
     }
 
     public TableModel getPubTableModel() {
