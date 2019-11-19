@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Class-Path: metrics-core-3.1.2.jar slf4j-api-1.7.7.jar jsoup-1.12.1.ja
+ r commons-lang3-3.9.jar leveldb-0.12.jar leveldb-api-0.12.jar guava-2
+ 1.0.jar commons-collections4-4.4.jar guava-27.1-jre.jar failureaccess
+ -1.0.1.jar listenablefuture-9999.0-empty-to-avoid-conflict-with-guava
+ .jar jsr305-3.0.2.jar checker-qual-2.5.2.jar error_prone_annotations-
+ 2.2.0.jar j2objc-annotations-1.1.jar animal-sniffer-annotations-1.17.
+ jar kotlin-stdlib.jar kotlin-reflect.jar kotlin-test.jar kotlin-stdli
+ b-jdk7.jar kotlin-stdlib-jdk8.jar sqlite-jdbc-3.27.2.jar okhttp-3.14.
+ 0.jar okio-1.17.2.jar imgscalr-lib-4.2.jar swingx-all-1.6.5-1.jar
+Main-Class: cc.joyreactor.JRViewer
+
