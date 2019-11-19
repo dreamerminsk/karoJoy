@@ -2,6 +2,7 @@ package cc.joyreactor.views;
 
 import cc.joyreactor.JRViewer;
 import cc.joyreactor.models.UpdateStats;
+import org.jdesktop.swingx.JXErrorPane;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -130,26 +131,30 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         tasks.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JPanel panel = new JPanel(new BorderLayout());
-                JScrollPane jScrollPane = new JScrollPane(new JTable(5, 5));
-                panel.add(jScrollPane, BorderLayout.CENTER);
+                try {
+                    JPanel panel = new JPanel(new BorderLayout());
+                    JScrollPane jScrollPane = new JScrollPane(new JTable(5, 5));
+                    panel.add(jScrollPane, BorderLayout.CENTER);
 
-                PopupFactory pf = PopupFactory.getSharedInstance();
-                Container parent = UpdaterView.this;
-                do {
-                    if (parent instanceof JRViewer) {
-                        break;
-                    }
-                    parent = parent.getParent();
+                    PopupFactory pf = PopupFactory.getSharedInstance();
+                    Container parent = UpdaterView.this;
+                    do {
+                        if (parent instanceof JRViewer) {
+                            break;
+                        }
+                        parent = parent.getParent();
 
-                } while (parent != null);
+                    } while (parent != null);
 
-                Point loc = parent.getLocationOnScreen();
-                MessagePopup mp = new MessagePopup((Frame) parent,
-                        stats,
-                        loc.x + parent.getWidth() / 3,
-                        loc.y + parent.getHeight() / 3);
-                mp.show();
+                    Point loc = parent.getLocationOnScreen();
+                    MessagePopup mp = new MessagePopup((Frame) parent,
+                            stats,
+                            loc.x + parent.getWidth() / 3,
+                            loc.y + parent.getHeight() / 3);
+                    mp.show();
+                } catch (Exception ex) {
+                    JXErrorPane.showDialog(ex);
+                }
             }
         });
         add(tasks);

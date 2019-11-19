@@ -8,6 +8,7 @@ import com.google.common.collect.Multiset;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.jdesktop.swingx.JXErrorPane;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import java.beans.PropertyChangeListener;
@@ -109,8 +110,10 @@ public class UpdateStats extends AbstractTableModel {
         });
         SES.scheduleAtFixedRate(() -> {
             IntStream.range(0, THREAD_COUNT).forEach(i -> {
-                fireTableCellUpdated(i, 3);
-                fireTableCellUpdated(i, 4);
+                SwingUtilities.invokeLater(() -> {
+                    fireTableCellUpdated(i, 3);
+                    fireTableCellUpdated(i, 4);
+                });
             });
         }, 768, 768, TimeUnit.MILLISECONDS);
     }
@@ -160,12 +163,16 @@ public class UpdateStats extends AbstractTableModel {
     }
 
     public void startTask(Thread currentThread, Instant started, String ref, String tag) {
-        int row = Integers.of(Strings.getLastSplitComponent(currentThread.getName(), "-"), 0);
-        threadList.put(row - 1, currentThread);
-        startedList.put(row - 1, started);
-        refList.put(row - 1, ref);
-        tagList.put(row - 1, tag);
-        fireTableRowsUpdated(row - 1, row - 1);
+        try {
+            int row = Integers.of(Strings.getLastSplitComponent(currentThread.getName(), "-"), 0);
+            threadList.put(row - 1, currentThread);
+            startedList.put(row - 1, started);
+            refList.put(row - 1, ref);
+            tagList.put(row - 1, tag);
+            fireTableRowsUpdated(row - 1, row - 1);
+        } catch (Exception e) {
+            JXErrorPane.showDialog(e);
+        }
     }
 
     @Override
@@ -180,19 +187,23 @@ public class UpdateStats extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if (columnIndex == 0) {
-            return threadList.get(rowIndex).getName();
-        } else if (columnIndex == 1) {
-            return tagList.get(rowIndex);
-        } else if (columnIndex == 2) {
-            return Strings.getLastSplitComponent(refList.get(rowIndex), "/");
-        } else if (columnIndex == 3) {
-            return threadList.get(rowIndex).getState();
-        } else if (columnIndex == 4) {
-            return DurationFormatUtils.formatDuration(
-                    Duration.between(startedList.get(rowIndex).atZone(ZoneId.systemDefault()).toLocalDateTime(),
-                            Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime()).toMillis(),
-                    "**HH:mm:ss**", true);
+        try {
+            if (columnIndex == 0) {
+                return threadList.get(rowIndex).getName();
+            } else if (columnIndex == 1) {
+                return tagList.get(rowIndex);
+            } else if (columnIndex == 2) {
+                return Strings.getLastSplitComponent(refList.get(rowIndex), "/");
+            } else if (columnIndex == 3) {
+                return threadList.get(rowIndex).getState();
+            } else if (columnIndex == 4) {
+                return DurationFormatUtils.formatDuration(
+                        Duration.between(startedList.get(rowIndex).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                                Instant.now().atZone(ZoneId.systemDefault()).toLocalDateTime()).toMillis(),
+                        "**HH:mm:ss**", true);
+            }
+        } catch (Exception e) {
+            JXErrorPane.showDialog(e);
         }
         return null;
     }
