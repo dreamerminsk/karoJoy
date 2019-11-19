@@ -3,6 +3,7 @@ package cc.joyreactor.models;
 import cc.joyreactor.data.Post;
 import cc.joyreactor.utils.Integers;
 import cc.joyreactor.utils.Strings;
+import com.google.common.collect.ConcurrentHashMultiset;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import javax.swing.table.AbstractTableModel;
@@ -38,11 +39,11 @@ public class UpdateStats extends AbstractTableModel {
     private ConcurrentSkipListMap<Integer, String> refList = new ConcurrentSkipListMap<>();
     private ConcurrentSkipListMap<Integer, String> tagList = new ConcurrentSkipListMap<>();
 
-    private ConcurrentSkipListMap<LocalDate, Long> pubs = new ConcurrentSkipListMap<>();
+    private ConcurrentHashMultiset<LocalDate> pubs = ConcurrentHashMultiset.create();
     private AbstractTableModel pubTableModel = new AbstractTableModel() {
         @Override
         public int getRowCount() {
-            return pubs.size();
+            return pubs.elementSet().size();
         }
 
         @Override
@@ -52,10 +53,11 @@ public class UpdateStats extends AbstractTableModel {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
+            LocalDate day = pubs.elementSet().stream().skip(rowIndex).findFirst().orElse(LocalDate.MIN);
             if (columnIndex == 0) {
-                return pubs.keySet().stream().skip(rowIndex).findFirst().orElse(LocalDate.MIN);
+                return day;
             } else if (columnIndex == 1) {
-                return pubs.values().stream().skip(rowIndex).findFirst().orElse(0L);
+                return pubs.count(day);
             }
             return null;
         }
@@ -161,11 +163,7 @@ public class UpdateStats extends AbstractTableModel {
     }
 
     public void processed(Post item) {
-        if (pubs.containsKey(item.getPublished().toLocalDate())) {
-            pubs.put(item.getPublished().toLocalDate(), pubs.get(item.getPublished().toLocalDate()) + 1);
-        } else {
-            pubs.put(item.getPublished().toLocalDate(), 1L);
-        }
+        pubs.add(item.getPublished().toLocalDate());
         pubTableModel.fireTableDataChanged();
     }
 
