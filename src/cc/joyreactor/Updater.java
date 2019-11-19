@@ -90,6 +90,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
             doc.select("div.postContainer").stream().map(this::parsePost)
                     .peek(stats::processed)
                     .forEachOrdered(this::update);
+            stats.startTask(Thread.currentThread(), tagRef.getKey(), tagRef.getValue(), "[" + parseTagString(doc) + "]");
         });
     }
 
