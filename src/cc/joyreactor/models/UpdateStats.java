@@ -4,7 +4,9 @@ import cc.joyreactor.data.Post;
 import cc.joyreactor.utils.Integers;
 import cc.joyreactor.utils.Strings;
 import com.google.common.collect.ConcurrentHashMultiset;
+import com.google.common.collect.Multiset;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.jdesktop.swingx.JXErrorPane;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
@@ -16,7 +18,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -62,6 +66,33 @@ public class UpdateStats extends AbstractTableModel {
                 return sortPubs.get(rowIndex);
             } else if (columnIndex == 1) {
                 return pubs.count(sortPubs.get(rowIndex));
+            }
+            return null;
+        }
+
+    };
+
+    private ConcurrentHashMultiset<String> tagStats = ConcurrentHashMultiset.create();
+    private AbstractTableModel tagTableModel = new AbstractTableModel() {
+        @Override
+        public int getRowCount() {
+            return tagStats.elementSet().size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 2;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            List<Multiset.Entry<String>> tags = tagStats.entrySet().stream()
+                    .sorted(Comparator.comparingInt(Multiset.Entry::getCount)).collect(Collectors.toList());
+            Collections.reverse(tags);
+            if (columnIndex == 0) {
+                return tags.get(rowIndex);
+            } else if (columnIndex == 1) {
+                return tagStats.count(tags.get(rowIndex).getElement());
             }
             return null;
         }
@@ -167,17 +198,38 @@ public class UpdateStats extends AbstractTableModel {
     }
 
     public void processed(Post item) {
-        pubs.add(item.getPublished().toLocalDate());
-        List<LocalDate> sortPubs = pubs.elementSet().stream().sorted().collect(Collectors.toList());
-        Collections.reverse(sortPubs);
-        IntStream.range(0, sortPubs.size())
-                .filter(i -> sortPubs.get(i).compareTo(item.getPublished().toLocalDate()) == 0)
-                .forEachOrdered(i -> pubTableModel.fireTableRowsUpdated(i, i));
+        try {
+            pubs.add(item.getPublished().toLocalDate());
+            List<LocalDate> sortPubs = pubs.elementSet().stream().sorted().collect(Collectors.toList());
+            Collections.reverse(sortPubs);
+            IntStream.range(0, sortPubs.size())
+                    .filter(i -> sortPubs.get(i).compareTo(item.getPublished().toLocalDate()) == 0)
+                    .forEachOrdered(i -> pubTableModel.fireTableRowsUpdated(i, i));
 
+
+            item.getTags().forEach(t -> tagStats.add(t.getTag()));
+            List<Multiset.Entry<String>> tags = tagStats.entrySet().stream()
+                    .sorted(Comparator.comparingInt(Multiset.Entry::getCount)).collect(Collectors.toList());
+            Collections.reverse(tags);
+            for (int i = 0; i < tags.size(); i++) {
+                for (int j = 0; j < item.getTags().size(); j++) {
+                    if (Objects.equals(tags.get(i).getElement(), item.getTags().get(j).getTag())) {
+                        tagTableModel.fireTableRowsUpdated(i, i);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            JXErrorPane.showDialog(e);
+        }
     }
 
     public TableModel getPubTableModel() {
         return pubTableModel;
+    }
+
+    public AbstractTableModel getTagTableModel() {
+        return tagTableModel;
     }
 }
 

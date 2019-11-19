@@ -4,6 +4,7 @@ import cc.joyreactor.JRViewer;
 import cc.joyreactor.models.UpdateStats;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -21,6 +22,7 @@ import java.util.stream.IntStream;
 
 import static cc.joyreactor.Updater.THREAD_COUNT;
 import static java.lang.String.format;
+import static javax.swing.event.TableModelEvent.INSERT;
 
 public class UpdaterView extends JPanel implements PropertyChangeListener {
 
@@ -34,6 +36,7 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
     private JLabel newPostsLabel;
     private JLabel tasks;
     private JLabel pubs;
+    private JLabel tagStats;
 
     public UpdaterView(UpdateStats stats) {
         super(new FlowLayout(FlowLayout.LEFT));
@@ -89,6 +92,37 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
             }
         });
         add(pubs);
+
+        tagStats = new JLabel(" TAGS: 0 ");
+        stats.getTagTableModel().addTableModelListener((TableModelEvent e) -> {
+            if (e.getType() == INSERT) {
+                tagStats.setText(" TAGS: " + e.getLastRow() + " ");
+            }
+        });
+        tagStats.setBorder(UIManager.getBorder("ScrollPane.border"));
+        tagStats.setFont(tagStats.getFont().deriveFont(14.0f));
+        tagStats.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                PopupFactory pf = PopupFactory.getSharedInstance();
+                Container parent = UpdaterView.this;
+                do {
+                    if (parent instanceof JRViewer) {
+                        break;
+                    }
+                    parent = parent.getParent();
+
+                } while (parent != null);
+
+                Point loc = parent.getLocationOnScreen();
+                MessagePopup mp = new MessagePopup((Frame) parent,
+                        stats.getTagTableModel(),
+                        loc.x + parent.getWidth() / 3,
+                        loc.y + parent.getHeight() / 3);
+                mp.show();
+            }
+        });
+        add(tagStats);
 
         tasks = new JLabel(" TASKS: 0 ");
         tasks.setBorder(UIManager.getBorder("ScrollPane.border"));
@@ -200,7 +234,7 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
 
             JPanel panel = new JPanel(new BorderLayout());
             JTable jTable = new JTable(tm);
-            jTable.setAutoCreateRowSorter(true);
+            //jTable.setAutoCreateRowSorter(true);
             JScrollPane jScrollPane = new JScrollPane(jTable);
             panel.add(jScrollPane, BorderLayout.CENTER);
             dialog.setContentPane(panel);
