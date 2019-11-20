@@ -51,7 +51,7 @@ public class ScrollView extends JPanel {
                 BufferedImage scaledImage = Scalr.resize(bufferedImage,
                         Scalr.Method.ULTRA_QUALITY,
                         Scalr.Mode.AUTOMATIC,
-                        700, 700);
+                        600, 600);
                 imageView.setIcon(new ImageIcon(scaledImage));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -94,11 +94,14 @@ public class ScrollView extends JPanel {
                 imageIndex.getAndIncrement();
                 SwingUtilities.invokeLater(this::updateUi);
             } else {
-                post.set(source.getLatestPost(post.get().getPublished()));
-                post.get().setImages(source.getPostImages(post.get().getId()));
-                post.get().setTags(source.getPostTags(postItem.getId()));
-                imageIndex.set(0);
-                SwingUtilities.invokeLater(this::updateUi);
+                postItem = source.getLatestPost(post.get().getPublished());
+                if (postItem != null) {
+                    post.set(postItem);
+                    postItem.setImages(source.getPostImages(postItem.getId()));
+                    postItem.setTags(source.getPostTags(postItem.getId()));
+                    imageIndex.set(0);
+                    SwingUtilities.invokeLater(this::updateUi);
+                }
             }
         });
 

@@ -16,10 +16,13 @@ public class JRViewer extends JFrame implements PropertyChangeListener {
 
     private static final String TITLE = "karoJoy";
 
-    private static final String VERSION = "v2019-11-11";
-    private static Updater updater;
+    private static final String VERSION = "v2019-11-20";
 
     private final UpdateStats stats = new UpdateStats();
+
+    private final Updater updater = new Updater(stats);
+
+
 
     private JRViewer() throws SQLException, IOException {
         super(TITLE + " " + VERSION);
@@ -40,7 +43,6 @@ public class JRViewer extends JFrame implements PropertyChangeListener {
             e.printStackTrace();
         }
         JRViewer jrViewer = new JRViewer();
-        updater = new Updater(jrViewer.stats);
     }
 
     private void setupUi() throws SQLException, IOException {

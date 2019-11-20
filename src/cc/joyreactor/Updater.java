@@ -43,6 +43,12 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         urlMap.put(Instant.now().minusSeconds(50), "http://joyreactor.cc/tag/Эротика/new");
         urlMap.put(Instant.now().minusSeconds(60), "http://joyreactor.cc/tag/Nature/new");
         urlMap.put(Instant.now().minusSeconds(70), "http://joyreactor.cc/tag/Art/new");
+
+        urlMap.put(Instant.now().minusSeconds(80), "http://pr.reactor.cc/tag/Panties+%26+Stockings%28PR%29/new");
+        urlMap.put(Instant.now().minusSeconds(90), "http://joyreactor.cc/tag/Fantasy ero/new");
+        urlMap.put(Instant.now().minusSeconds(100), "http://joyreactor.cc/tag/Anime Ero Pussy/new");
+        urlMap.put(Instant.now().minusSeconds(110), "http://joyreactor.cc/tag/art девушка/new");
+        urlMap.put(Instant.now().minusSeconds(120), "http://joyreactor.cc/tag/попка/new");
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
@@ -116,7 +122,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
 
     private String parseTagString(Element post) {
         return post.select("div#blogName h1").stream()
-                .map(Element::text).findFirst().orElse("");
+                .map(Element::text).findFirst().orElse("---JoyReactor---");
     }
 
     private Post parsePost(Element post) {
