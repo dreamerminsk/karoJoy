@@ -34,13 +34,15 @@ public class ScrollView extends JPanel {
         source = Source.getInstance();
         post.set(source.getLatestPost(Instant.now().atZone(ZoneId.systemDefault())));
         post.get().setImages(source.getPostImages(post.get().getId()));
+        post.get().setTags(source.getPostTags(post.get().getId()));
         setupUi();
         updateUi();
     }
 
     private void updateUi() {
-        view.setTitle("" + post.get().getUser().getName() + " / " + (post.get().getId() + 1) + ", " +
-                imageIndex.get() + " from " + post.get().getImages().size());
+        view.setTitle("" + post.get().getUser().getName() + " / " + (post.get().getId()) + " / " +
+                (imageIndex.get() + 1) + " from " + post.get().getImages().size() + " / " +
+                post.get().getTags());
         int idx = imageIndex.get();
         Post postItem = post.get();
         if (idx < postItem.getImages().size()) {
@@ -74,9 +76,10 @@ public class ScrollView extends JPanel {
                 imageIndex.getAndDecrement();
                 SwingUtilities.invokeLater(this::updateUi);
             } else {
-                post.set(source.getPrevLatestPost(post.get().getPublished()));
-                post.get().setImages(source.getPostImages(post.get().getId()));
-                imageIndex.set(post.get().getImages().size() - 1);
+                post.set(source.getPrevLatestPost(postItem.getPublished()));
+                postItem.setImages(source.getPostImages(postItem.getId()));
+                postItem.setTags(source.getPostTags(postItem.getId()));
+                imageIndex.set(postItem.getImages().size() - 1);
                 SwingUtilities.invokeLater(this::updateUi);
             }
         });

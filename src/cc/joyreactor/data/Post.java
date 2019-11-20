@@ -44,7 +44,11 @@ public class Post {
     }
 
     public List<Tag> getTags() {
-        return Collections.unmodifiableList(tags);
+        if (tags != null) {
+            return Collections.unmodifiableList(tags);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     public void setTags(List<Tag> tags) {
