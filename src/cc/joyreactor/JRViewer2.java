@@ -19,6 +19,7 @@ public class JRViewer2 extends JFrame implements PropertyChangeListener {
     private static Updater updater;
 
     private final UpdateStats stats = new UpdateStats();
+    private ScrollView view;
 
     private JRViewer2() throws SQLException, IOException {
         super(TITLE + " " + VERSION);
@@ -42,8 +43,9 @@ public class JRViewer2 extends JFrame implements PropertyChangeListener {
         updater = new Updater(jrViewer.stats);
     }
 
-    private void setupUi() throws SQLException, IOException {
-        add(new ScrollView(), BorderLayout.CENTER);
+    private void setupUi() throws SQLException {
+        view = new ScrollView();
+        add(new JScrollPane(view), BorderLayout.CENTER);
         UpdaterView updaterView = new UpdaterView(stats);
         updaterView.addPropertyChangeListener(this);
         add(new JScrollPane(updaterView), BorderLayout.PAGE_END);
