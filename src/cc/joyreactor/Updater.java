@@ -25,10 +25,8 @@ import java.util.stream.IntStream;
 public class Updater extends SwingWorker<UpdateStats, String> {
 
     public static final int THREAD_COUNT = 16;
-
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
-
     private final static ConcurrentSkipListMap<Instant, String> urlMap = new ConcurrentSkipListMap<>();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
     private final Source source;
     private final UpdateStats stats;
     private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
@@ -52,7 +50,7 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
-        tags.stream().limit(THREAD_COUNT).forEachOrdered(tag -> {
+        tags.stream().limit(32).forEachOrdered(tag -> {
             if (tag.getRef().endsWith("/")) {
                 urlMap.put(Instant.now().minusSeconds(tlr.nextInt(0, 60)), tag.getRef() + "new");
             } else {
@@ -82,13 +80,15 @@ public class Updater extends SwingWorker<UpdateStats, String> {
             System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + parseTagString(doc) + "' : " + tagRef);
 
             Tag tag = source.getTag(parseTagString(doc));
-            if (tag.getAvatar() == null) {
-                tag.setAvatar(parseTagAvatar(doc));
-                source.updateTag(tag);
-            }
-            if (tag.getBanner() == null) {
-                tag.setBanner(parseTagBanner(doc));
-                source.updateTag(tag);
+            if (tag != null) {
+                if (tag.getAvatar() == null) {
+                    tag.setAvatar(parseTagAvatar(doc));
+                    source.updateTag(tag);
+                }
+                if (tag.getBanner() == null) {
+                    tag.setBanner(parseTagBanner(doc));
+                    source.updateTag(tag);
+                }
             }
 
             doc.select("a.next").forEach(next -> urlMap.putIfAbsent(Instant.now(), next.attr("abs:href")));
@@ -181,8 +181,12 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     }
 
     private BigDecimal parseRating(Element post) {
-        return post.select(".ufoot .post_rating").stream().map(Element::text)
-                .map(BigDecimal::new).findFirst().orElse(new BigDecimal(0.0d));
+        try {
+            return post.select(".ufoot .post_rating").stream().map(Element::text)
+                    .map(BigDecimal::new).findFirst().orElse(new BigDecimal(0.0d));
+        } catch (Exception e) {
+            return new BigDecimal(0.0d);
+        }
     }
 
     private Integer parsePostId(Element post) {
