@@ -44,7 +44,7 @@ public class JRViewer2 extends JFrame implements PropertyChangeListener {
     }
 
     private void setupUi() throws SQLException {
-        view = new ScrollView();
+        view = new ScrollView(this);
         add(new JScrollPane(view), BorderLayout.CENTER);
         UpdaterView updaterView = new UpdaterView(stats);
         updaterView.addPropertyChangeListener(this);

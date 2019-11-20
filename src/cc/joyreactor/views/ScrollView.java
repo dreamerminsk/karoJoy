@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ScrollView extends JPanel {
 
     private final Source source;
+    private final JFrame view;
 
     private AtomicReference<Post> post = new AtomicReference<>();
     private AtomicInteger imageIndex = new AtomicInteger(0);
@@ -27,8 +28,9 @@ public class ScrollView extends JPanel {
     private JButton prev;
     private JButton next;
 
-    public ScrollView() throws SQLException {
+    public ScrollView(JFrame view) throws SQLException {
         super(new BorderLayout());
+        this.view = view;
         source = Source.getInstance();
         post.set(source.getLatestPost(Instant.now().atZone(ZoneId.systemDefault())));
         post.get().setImages(source.getPostImages(post.get().getId()));
@@ -37,6 +39,8 @@ public class ScrollView extends JPanel {
     }
 
     private void updateUi() {
+        view.setTitle("" + post.get().getUser().getName() + " / " + (post.get().getId() + 1) + ", " +
+                imageIndex.get() + " from " + post.get().getImages().size());
         int idx = imageIndex.get();
         Post postItem = post.get();
         if (idx < postItem.getImages().size()) {
@@ -54,7 +58,6 @@ public class ScrollView extends JPanel {
     }
 
     private void setupUi() {
-        getParent2();
         imagePanel = new JPanel(new BorderLayout());
         imageView = new JLabel();
         JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -96,17 +99,5 @@ public class ScrollView extends JPanel {
         });
 
         add(imagePanel, BorderLayout.CENTER);
-    }
-
-    private Component getParent2() {
-        Container parent = this;
-        do {
-            //if (parent instanceof JRViewer) {
-            //  break;
-            //}
-            System.out.println(parent.getClass().getSimpleName());
-            parent = parent.getParent();
-        } while (parent != null);
-        return parent;
     }
 }
