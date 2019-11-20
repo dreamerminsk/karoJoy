@@ -96,6 +96,7 @@ public class ScrollView extends JPanel {
             } else {
                 post.set(source.getLatestPost(post.get().getPublished()));
                 post.get().setImages(source.getPostImages(post.get().getId()));
+                postItem.setTags(source.getPostTags(postItem.getId()));
                 imageIndex.set(0);
                 SwingUtilities.invokeLater(this::updateUi);
             }
