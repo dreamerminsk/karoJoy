@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
 
 public class Updater extends SwingWorker<UpdateStats, String> {
 
-    public static final int THREAD_COUNT = 16;
+    public static final int THREAD_COUNT = 20;
     private final static ConcurrentSkipListMap<Instant, String> urlMap = new ConcurrentSkipListMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
     private final Source source;
