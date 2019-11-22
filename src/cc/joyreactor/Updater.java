@@ -34,19 +34,70 @@ public class Updater extends SwingWorker<UpdateStats, String> {
     public Updater(UpdateStats stats) throws SQLException {
         this.stats = stats;
         source = Source.getInstance();
-        urlMap.put(Instant.now().minusSeconds(10), "http://joyreactor.cc/new");
-        urlMap.put(Instant.now().minusSeconds(20), "http://pr.reactor.cc/new");
-        urlMap.put(Instant.now().minusSeconds(30), "http://anime.reactor.cc/new");
-        urlMap.put(Instant.now().minusSeconds(40), "http://anime.reactor.cc/tag/Anime Ero/new");
-        urlMap.put(Instant.now().minusSeconds(50), "http://joyreactor.cc/tag/Эротика/new");
-        urlMap.put(Instant.now().minusSeconds(60), "http://joyreactor.cc/tag/Nature/new");
-        urlMap.put(Instant.now().minusSeconds(70), "http://joyreactor.cc/tag/Art/new");
+        urlMap.put(Instant.now().minusSeconds(10), "http://joyreactor.cc/tag/%D0%BA%D1%80%D0%B0%D1%81%D0%B8%D0%B2%D1%8B%D0%B5+%D0%BA%D0%B0%D1%80%D1%82%D0%B8%D0%BD%D0%BA%D0%B8/new");
+        urlMap.put(Instant.now().minusSeconds(20), "http://joyreactor.cc/tag/%D0%B0%D1%80%D1%82+%D0%B1%D0%B0%D1%80%D1%8B%D1%88%D0%BD%D1%8F/new");
+        urlMap.put(Instant.now().minusSeconds(30), "http://joyreactor.cc/tag/Fantasy/new");
+        urlMap.put(Instant.now().minusSeconds(40), "http://joyreactor.cc/tag/Sci-Fi/new");
+        urlMap.put(Instant.now().minusSeconds(50), "http://joyreactor.cc/tag/%D0%9C%D1%80%D0%B0%D1%87%D0%BD%D1%8B%D0%B5+%D0%BA%D0%B0%D1%80%D1%82%D0%B8%D0%BD%D0%BA%D0%B8/new");
+        urlMap.put(Instant.now().minusSeconds(60), "http://joyreactor.cc/tag/Traditional+art/new");
+        urlMap.put(Instant.now().minusSeconds(70), "http://joyreactor.cc/tag/digital+art/new");
+        urlMap.put(Instant.now().minusSeconds(10), "http://joyreactor.cc/tag/animal+art/new");
+        urlMap.put(Instant.now().minusSeconds(20), "http://joyreactor.cc/tag/Pin-Up/new");
+        urlMap.put(Instant.now().minusSeconds(30), "http://joyreactor.cc/tag/%D0%BE%D0%B1%D0%BE%D0%B8/new");
+        urlMap.put(Instant.now().minusSeconds(40), "http://joyreactor.cc/tag/Sci-Fi/new");
+        urlMap.put(Instant.now().minusSeconds(50), "http://joyreactor.cc/tag/%D0%9C%D1%80%D0%B0%D1%87%D0%BD%D1%8B%D0%B5+%D0%BA%D0%B0%D1%80%D1%82%D0%B8%D0%BD%D0%BA%D0%B8/new");
+        urlMap.put(Instant.now().minusSeconds(60), "http://joyreactor.cc/tag/Traditional+art/new");
+        urlMap.put(Instant.now().minusSeconds(70), "http://joyreactor.cc/tag/digital+art/new");
+        urlMap.put(Instant.now().minusSeconds(70), "http://joyreactor.cc/tag/art/new");
 
-        urlMap.put(Instant.now().minusSeconds(80), "http://pr.reactor.cc/tag/Panties+%26+Stockings%28PR%29/new");
-        urlMap.put(Instant.now().minusSeconds(90), "http://joyreactor.cc/tag/Fantasy ero/new");
-        urlMap.put(Instant.now().minusSeconds(100), "http://joyreactor.cc/tag/Anime Ero Pussy/new");
-        urlMap.put(Instant.now().minusSeconds(110), "http://joyreactor.cc/tag/art девушка/new");
-        urlMap.put(Instant.now().minusSeconds(120), "http://joyreactor.cc/tag/попка/new");
+        urlMap.put(Instant.now().minusSeconds(80), "http://anime.reactor.cc/new");
+        urlMap.put(Instant.now().minusSeconds(90), "http://anime.reactor.cc/tag/Anime+Ero/new");
+        urlMap.put(Instant.now().minusSeconds(100), "http://anime.reactor.cc/tag/%D0%AD%D1%82%D1%82%D0%B8/new");
+        urlMap.put(Instant.now().minusSeconds(110), "http://anime.reactor.cc/tag/Animal+Ears/new");
+        urlMap.put(Instant.now().minusSeconds(120), "http://anime.reactor.cc/tag/Anime+%D0%9A%D0%BE%D0%BC%D0%B8%D0%BA%D1%81%D1%8B/new");
+        urlMap.put(Instant.now().minusSeconds(80), "http://anime.reactor.cc/tag/Anime+%D0%93%D0%B8%D1%84%D0%BA%D0%B8/new");
+        urlMap.put(Instant.now().minusSeconds(90), "http://anime.reactor.cc/tag/Anime+Cosplay/new");
+        urlMap.put(Instant.now().minusSeconds(100), "http://anime.reactor.cc/tag/Anime+%D0%9D%D1%8F%D1%88%D0%B8/new");
+        urlMap.put(Instant.now().minusSeconds(110), "http://anime.reactor.cc/tag/Manga/new");
+        urlMap.put(Instant.now().minusSeconds(120), "http://anime.reactor.cc/tag/AMV/new");
+        urlMap.put(Instant.now().minusSeconds(80), "http://anime.reactor.cc/tag/Anime+Ero+Pantsu/new");
+        urlMap.put(Instant.now().minusSeconds(90), "http://anime.reactor.cc/tag/Oppai/new");
+        urlMap.put(Instant.now().minusSeconds(100), "http://anime.reactor.cc/tag/Anime+Ero+Swim/new");
+        urlMap.put(Instant.now().minusSeconds(110), "http://anime.reactor.cc/tag/Anime+Ero+Ass/new");
+        urlMap.put(Instant.now().minusSeconds(120), "http://anime.reactor.cc/tag/Kyonyuu/new");
+        urlMap.put(Instant.now().minusSeconds(80), "http://anime.reactor.cc/tag/Anime+Ero+Pussy/new");
+        urlMap.put(Instant.now().minusSeconds(90), "http://anime.reactor.cc/tag/Anime+Ero+Yuri/new");
+
+        urlMap.put(Instant.now().minusSeconds(80), "http://pr.reactor.cc/new");
+        urlMap.put(Instant.now().minusSeconds(90), "http://pr.reactor.cc/tag/Fully+girl%28PR%29/new");
+        urlMap.put(Instant.now().minusSeconds(100), "http://pr.reactor.cc/tag/Lingerie%28PR%29/new");
+        urlMap.put(Instant.now().minusSeconds(110), "http://pr.reactor.cc/tag/Panties%28PR%29/new");
+        urlMap.put(Instant.now().minusSeconds(120), "http://pr.reactor.cc/tag/Panties+%26+Stockings%28PR%29/new");
+        urlMap.put(Instant.now().minusSeconds(80), "http://pr.reactor.cc/tag/Stockings%28PR%29/new");
+        urlMap.put(Instant.now().minusSeconds(90), "http://anime.reactor.cc/tag/Anime+Cosplay/new");
+        urlMap.put(Instant.now().minusSeconds(100), "http://pr.reactor.cc/tag/Photoset%28PR%29/new");
+        urlMap.put(Instant.now().minusSeconds(110), "http://pr.reactor.cc/tag/swimsuit%28PR%29/new");
+        urlMap.put(Instant.now().minusSeconds(120), "http://pr.reactor.cc/tag/Pleasure+Room+gif/new");
+        urlMap.put(Instant.now().minusSeconds(80), "http://pr.reactor.cc/tag/%D0%9A%D0%B0%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%BE+%D0%B2+%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D1%8F%D1%85%28PR%29/new");
+        urlMap.put(Instant.now().minusSeconds(90), "http://pr.reactor.cc/tag/Joy+Model%28PR%29/new");
+        urlMap.put(Instant.now().minusSeconds(100), "http://pr.reactor.cc/tag/Pleasure+Room+Art/new");
+        urlMap.put(Instant.now().minusSeconds(110), "http://pr.reactor.cc/tag/Amateur%28PR%29/new");
+
+
+        urlMap.put(Instant.now().minusSeconds(80), "http://joyreactor.cc/tag/%D0%AD%D1%80%D0%BE%D1%82%D0%B8%D0%BA%D0%B0/new");
+        urlMap.put(Instant.now().minusSeconds(90), "http://joyreactor.cc/tag/%D1%81%D0%B8%D1%81%D1%8C%D0%BA%D0%B8/new");
+        urlMap.put(Instant.now().minusSeconds(100), "http://joyreactor.cc/tag/%D0%B4%D0%BE%D0%BC%D0%B0%D1%88%D0%BD%D1%8F%D1%8F+%D1%8D%D1%80%D0%BE%D1%82%D0%B8%D0%BA%D0%B0/new");
+        urlMap.put(Instant.now().minusSeconds(110), "http://joyreactor.cc/tag/%D0%BF%D0%B5%D1%81%D0%BE%D1%87%D0%BD%D0%B8%D1%86%D0%B0+%D1%8D%D1%80%D0%BE%D1%82%D0%B8%D0%BA%D0%B8/new");
+        urlMap.put(Instant.now().minusSeconds(120), "http://joyreactor.cc/tag/%D0%BF%D0%BE%D0%BF%D0%B0/new");
+        urlMap.put(Instant.now().minusSeconds(80), "http://joyreactor.cc/tag/%D1%8D%D1%80%D0%BE%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5+%D0%B3%D0%B8%D1%84%D0%BA%D0%B8/new");
+        urlMap.put(Instant.now().minusSeconds(90), "http://joyreactor.cc/tag/%D0%BB%D0%B5%D0%B3%D0%BA%D0%B0%D1%8F+%D1%8D%D1%80%D0%BE%D1%82%D0%B8%D0%BA%D0%B0/new");
+        urlMap.put(Instant.now().minusSeconds(100), "http://joyreactor.cc/tag/%D1%8D%D1%80%D0%BE%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9+%D0%BF%D0%B8%D1%80%D1%81%D0%B8%D0%BD%D0%B3/new");
+        urlMap.put(Instant.now().minusSeconds(110), "http://joyreactor.cc/tag/ero-art/new");
+        urlMap.put(Instant.now().minusSeconds(120), "http://joyreactor.cc/tag/ero+monochrome/new");
+        urlMap.put(Instant.now().minusSeconds(110), "http://joyreactor.cc/tag/%D0%BF%D0%BB%D1%8F%D0%B6%D0%BD%D0%B0%D1%8F+%D1%8D%D1%80%D0%BE%D1%82%D0%B8%D0%BA%D0%B0/new");
+
+
+
         List<Tag> tags = source.getTags();
         Collections.shuffle(tags, ThreadLocalRandom.current());
 
