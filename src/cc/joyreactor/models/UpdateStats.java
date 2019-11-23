@@ -10,7 +10,6 @@ import org.jdesktop.swingx.JXErrorPane;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.math.BigDecimal;
@@ -48,30 +47,7 @@ public class UpdateStats extends AbstractTableModel {
     private ConcurrentSkipListMap<Integer, String> tagList = new ConcurrentSkipListMap<>();
 
     private ConcurrentHashMultiset<LocalDate> pubs = ConcurrentHashMultiset.create();
-    private AbstractTableModel pubTableModel = new AbstractTableModel() {
-        @Override
-        public int getRowCount() {
-            return pubs.elementSet().size();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return 2;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            List<LocalDate> sortPubs = pubs.elementSet().stream().sorted().collect(Collectors.toList());
-            Collections.reverse(sortPubs);
-            if (columnIndex == 0) {
-                return sortPubs.get(rowIndex);
-            } else if (columnIndex == 1) {
-                return pubs.count(sortPubs.get(rowIndex));
-            }
-            return null;
-        }
-
-    };
+    private PublishedTreeTableModel pubTableModel = new PublishedTreeTableModel();
 
     private ConcurrentHashMultiset<String> tagStats = ConcurrentHashMultiset.create();
     private AbstractTableModel tagTableModel = new AbstractTableModel() {
@@ -210,12 +186,7 @@ public class UpdateStats extends AbstractTableModel {
 
     public void processed(Post item) {
         try {
-            pubs.add(item.getPublished().toLocalDate());
-            List<LocalDate> sortPubs = pubs.elementSet().stream().sorted().collect(Collectors.toList());
-            Collections.reverse(sortPubs);
-            IntStream.range(0, sortPubs.size())
-                    .filter(i -> sortPubs.get(i).compareTo(item.getPublished().toLocalDate()) == 0)
-                    .forEachOrdered(i -> pubTableModel.fireTableRowsUpdated(i, i));
+            pubTableModel.updateStats(item.getPublished());
 
 
             item.getTags().forEach(t -> tagStats.add(t.getTag()));
@@ -235,7 +206,7 @@ public class UpdateStats extends AbstractTableModel {
         }
     }
 
-    public TableModel getPubTableModel() {
+    public PublishedTreeTableModel getPubTableModel() {
         return pubTableModel;
     }
 

@@ -3,6 +3,8 @@ package cc.joyreactor.views;
 import cc.joyreactor.JRViewer;
 import cc.joyreactor.models.UpdateStats;
 import org.jdesktop.swingx.JXErrorPane;
+import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.treetable.TreeTableModel;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -85,7 +87,7 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
                 } while (parent != null);
 
                 Point loc = parent.getLocationOnScreen();
-                MessagePopup mp = new MessagePopup((Frame) parent,
+                TreeMessagePopup mp = new TreeMessagePopup((Frame) parent,
                         stats.getPubTableModel(),
                         loc.x + parent.getWidth() / 3,
                         loc.y + parent.getHeight() / 3);
@@ -240,6 +242,47 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
             JPanel panel = new JPanel(new BorderLayout());
             JTable jTable = new JTable(tm);
             //jTable.setAutoCreateRowSorter(true);
+            JScrollPane jScrollPane = new JScrollPane(jTable);
+            panel.add(jScrollPane, BorderLayout.CENTER);
+            dialog.setContentPane(panel);
+            panel.setBorder(new JPopupMenu().getBorder());
+            dialog.setSize(panel.getPreferredSize());
+        }
+
+        @Override
+        public void show() {
+            dialog.addWindowFocusListener(this);
+            dialog.setVisible(true);
+        }
+
+        @Override
+        public void hide() {
+            dialog.setVisible(false);
+            dialog.removeWindowFocusListener(this);
+        }
+
+        public void windowGainedFocus(WindowEvent e) {
+            // NO-OP
+        }
+
+        public void windowLostFocus(WindowEvent e) {
+            hide();
+        }
+    }
+
+    private class TreeMessagePopup extends Popup
+            implements WindowFocusListener {
+        private final JWindow dialog;
+
+        public TreeMessagePopup(Frame base, TreeTableModel tm, int x, int y) {
+            super();
+            dialog = new JWindow(base);
+            dialog.setFocusable(true);
+            dialog.setLocation(x, y);
+
+            JPanel panel = new JPanel(new BorderLayout());
+            JXTreeTable jTable = new JXTreeTable(tm);
+            jTable.setAutoCreateRowSorter(true);
             JScrollPane jScrollPane = new JScrollPane(jTable);
             panel.add(jScrollPane, BorderLayout.CENTER);
             dialog.setContentPane(panel);
