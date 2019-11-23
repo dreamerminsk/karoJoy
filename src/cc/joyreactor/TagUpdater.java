@@ -5,13 +5,18 @@ import ch.caro62.services.WebClient;
 import org.jsoup.nodes.Element;
 
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
 public class TagUpdater {
 
     public static final int THREAD_COUNT = 32;
+
+    private static final DecimalFormat df = new DecimalFormat("###,###");
 
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
 
@@ -19,11 +24,16 @@ public class TagUpdater {
     private final Source source;
     private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
 
+    private final AtomicLong avatarCount = new AtomicLong(0);
+    private final AtomicLong avatarSize = new AtomicLong(0);
+    private final AtomicLong bannerCount = new AtomicLong(0);
+    private final AtomicLong bannerSize = new AtomicLong(0);
+
     public TagUpdater() throws SQLException {
         source = Source.getInstance();
         List<Tag> tags = source.getTags();
 
-        tags.stream().filter((item) -> item.getAvatar() == null).forEachOrdered(tag -> urlMap.addLast(tag));
+        tags.stream().filter((item) -> item.getAvatar() == null).forEachOrdered(urlMap::addLast);
     }
 
     public static void main(String... args) throws SQLException {
@@ -36,17 +46,19 @@ public class TagUpdater {
 
     private void parsePage() {
         Tag tagRef = urlMap.pollFirst();
-        WebClient.getDocSync(tagRef.getRef()).ifPresent((doc) -> {
-            System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getTag() + "' : " + tagRef);
+        WebClient.getDocSync(Objects.requireNonNull(tagRef).getRef()).ifPresent((doc) -> {
+            System.out.println("\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + tagRef.getTag() + "' : " + tagRef);
 
             if (tagRef.getAvatar() == null) {
                 tagRef.setAvatar(parseTagAvatar(doc));
-                System.out.println("\t\t\tAVATAR: " + tagRef.getAvatar().length);
+                System.out.println("\t\tAVATAR-" + avatarCount.incrementAndGet() + ": " + tagRef.getAvatar().length);
+                System.out.println("\t\tAVATAR-ALL: " + df.format(avatarSize.addAndGet(tagRef.getAvatar().length)));
                 source.updateTag(tagRef);
             }
             if (tagRef.getBanner() == null) {
                 tagRef.setBanner(parseTagBanner(doc));
-                System.out.println("\t\t\tBANNER: " + tagRef.getBanner().length);
+                System.out.println("\t\tBANNER-" + bannerCount.incrementAndGet() + ": " + tagRef.getBanner().length);
+                System.out.println("\t\tBANNER-ALL: " + df.format(bannerSize.addAndGet(tagRef.getBanner().length)));
                 source.updateTag(tagRef);
             }
 
