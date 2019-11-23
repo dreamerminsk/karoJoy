@@ -59,6 +59,27 @@ public class Source {
         return tags;
     }
 
+    public List<Tag> getTagsWithoutBanner() {
+        List<Tag> tags = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM jr_tags WHERE tag_banner IS NULL;")) {
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    tags.add(new Tag(
+                            rs.getInt("tag_id"),
+                            rs.getString("tag"),
+                            rs.getString("ref"),
+                            rs.getString("ids"),
+                            rs.getBytes("tag_avatar"),
+                            rs.getBytes("tag_banner")));
+                }
+            }
+        } catch (SQLException ex) {
+            //JXErrorPane.showDialog(ex);
+            return tags;
+        }
+        return tags;
+    }
+
     public Tag getTag(String word) {
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM jr_tags WHERE tag=?;")) {
             statement.setString(1, word);

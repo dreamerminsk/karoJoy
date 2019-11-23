@@ -31,9 +31,9 @@ public class TagUpdater {
 
     public TagUpdater() throws SQLException {
         source = Source.getInstance();
-        List<Tag> tags = source.getTags();
+        List<Tag> tags = source.getTagsWithoutBanner();
 
-        tags.stream().filter((item) -> item.getAvatar() == null).forEachOrdered(urlMap::addLast);
+        tags.stream().forEachOrdered(urlMap::addLast);
     }
 
     public static void main(String... args) throws SQLException {
