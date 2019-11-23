@@ -308,8 +308,8 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         imagesMenu = new JPanel(new FlowLayout(FlowLayout.CENTER));
         imagesBox = Box.createVerticalBox();
         postImage = new JLabel();
-        imagesPanel.add(new JScrollPane(imagesMenu), BorderLayout.PAGE_START);
-        imagesPanel.add(new JScrollPane(imagesBox), BorderLayout.CENTER);
+        //imagesPanel.add(new JScrollPane(imagesMenu), BorderLayout.PAGE_START);
+        imagesPanel.add(new JScrollPane(imagesMenu), BorderLayout.CENTER);
         c.gridx = 0;
         c.gridy = 3;
         c.gridwidth = 3;
@@ -327,7 +327,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         c.weighty = 1.0;
         c.weightx = 1.0;
         c.fill = GridBagConstraints.BOTH;
-        comp.add(new JScrollPane(tagStats), c);
+        //comp.add(new JScrollPane(tagStats), c);
 
         return comp;
     }
@@ -364,7 +364,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                                 Scalr.resize(bufferedImage,
                                         Scalr.Method.ULTRA_QUALITY,
                                         Scalr.Mode.AUTOMATIC,
-                                        256, 256), ES)
+                                        512, 512), ES)
                                 .thenAcceptAsync((pic) -> SwingUtilities.invokeLater(() ->
                                 {
                                     imagesMenu.add(new JLabel(new ImageIcon(pic)));

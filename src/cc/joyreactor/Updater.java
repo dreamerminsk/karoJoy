@@ -100,14 +100,14 @@ public class Updater extends SwingWorker<UpdateStats, String> {
         scheduler.scheduleWithFixedDelay(() -> {
             List<Tag> tags = source.getTags();
             Collections.shuffle(tags, ThreadLocalRandom.current());
-            tags.stream().limit(8).forEachOrdered(tag -> {
+            tags.stream().limit(16).forEachOrdered(tag -> {
                 if (tag.getRef().endsWith("/")) {
-                    urlMap.put(Instant.now().minusSeconds(tlr.nextInt(0, 60)), tag.getRef() + "new");
+                    urlMap.put(Instant.now().minusSeconds(tlr.nextInt(1000, 6000)), tag.getRef() + "new");
                 } else {
-                    urlMap.put(Instant.now().minusSeconds(tlr.nextInt(0, 60)), tag.getRef() + "/new");
+                    urlMap.put(Instant.now().minusSeconds(tlr.nextInt(1000, 6000)), tag.getRef() + "/new");
                 }
             });
-        }, 10, 10, TimeUnit.MINUTES);
+        }, 0, 10, TimeUnit.MINUTES);
     }
 
     @Override
