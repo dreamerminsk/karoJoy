@@ -33,7 +33,7 @@ public class TagUpdater {
         source = Source.getInstance();
         List<Tag> tags = source.getTagsWithoutBanner();
 
-        tags.stream().forEachOrdered(urlMap::addLast);
+        tags.forEach(urlMap::addLast);
     }
 
     public static void main(String... args) throws SQLException {
@@ -51,13 +51,13 @@ public class TagUpdater {
 
             if (tagRef.getAvatar() == null) {
                 tagRef.setAvatar(parseTagAvatar(doc));
-                System.out.println("\t\tAVATAR-" + avatarCount.incrementAndGet() + ": " + tagRef.getAvatar().length);
+                System.out.println("\t\tAVATAR-" + avatarCount.incrementAndGet() + ": " + df.format(tagRef.getAvatar().length));
                 System.out.println("\t\tAVATAR-ALL: " + df.format(avatarSize.addAndGet(tagRef.getAvatar().length)));
                 source.updateTag(tagRef);
             }
             if (tagRef.getBanner() == null) {
                 tagRef.setBanner(parseTagBanner(doc));
-                System.out.println("\t\tBANNER-" + bannerCount.incrementAndGet() + ": " + tagRef.getBanner().length);
+                System.out.println("\t\tBANNER-" + bannerCount.incrementAndGet() + ": " + df.format(tagRef.getBanner().length));
                 System.out.println("\t\tBANNER-ALL: " + df.format(bannerSize.addAndGet(tagRef.getBanner().length)));
                 source.updateTag(tagRef);
             }
