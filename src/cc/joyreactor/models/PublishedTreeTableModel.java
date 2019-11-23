@@ -126,6 +126,5 @@ public class PublishedTreeTableModel extends AbstractTreeTableModel {
             modelSupport.fireChildChanged(new TreePath(root), years
                     .indexOf(Year.of(day.getYear())), Year.of(day.getYear()));
         }
-        this.modelSupport.fireNewRoot();
     }
 }
