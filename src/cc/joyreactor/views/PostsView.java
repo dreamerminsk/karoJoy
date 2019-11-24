@@ -5,7 +5,6 @@ import cc.joyreactor.data.Post;
 import cc.joyreactor.data.Tag;
 import cc.joyreactor.models.PostsModel;
 import cc.joyreactor.utils.Strings;
-import ch.caro62.utils.SwingExecutor;
 import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
@@ -31,10 +30,8 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.IntStream;
 
 public class PostsView extends JPanel implements PropertyChangeListener {
 
@@ -53,7 +50,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     private JPanel postImages;
     private Box imagesBox;
     private JLabel commentsLabel;
-    private JTagStatsView tagStats;
+    private JFilterView tagStats;
     private JPanel imagesMenu;
     private JPanel crPanel;
 
@@ -311,16 +308,9 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                                     imagesPanel.revalidate();
                                     imagesPanel.repaint();
                                 }), ES);
-                        JLabel pImage = new JLabel();
                         JLabel label = new JLabel(Strings.getLastSplitComponent(
                                 URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"));
                         label.setFont(label.getFont().deriveFont(16.0f));
-                        //imagesBox.add(label, JComponent.CENTER_ALIGNMENT);
-                        //imagesBox.add(pImage, JComponent.CENTER_ALIGNMENT);
-                        //imagesBox.revalidate();
-                        //imagesBox.repaint();
-                        //updatePostImage(pImage, bufferedImage);
-                        //postImage.setIcon(new ImageIcon(bufferedImage));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -414,28 +404,6 @@ public class PostsView extends JPanel implements PropertyChangeListener {
                 }
             }
         }
-    }
-
-    private void updateLabel2(JLabel l, String t) {
-        if (l.getText().equals(t)) return;
-        final int minLength = Math.min(l.getText().length(), t.length());
-        IntStream.range(0, minLength).forEach(i -> {
-            char[] chars = l.getText().toCharArray();
-            chars[i] = t.charAt(i);
-            System.out.println("TITLE: " + new String(chars));
-            updateLabelTitle(l, new String(chars));
-        });
-        IntStream.range(minLength, l.getText().length()).forEach(i -> updateLabelTitle(l, l.getText().substring(0, minLength) + l.getText().substring(minLength + 1)));
-        IntStream.range(minLength, t.length()).forEach(i -> updateLabelTitle(l, l.getText() + t.charAt(i)));
-    }
-
-    private void updateLabelTitle(JLabel l, String t) {
-        System.out.println("TITLE: " + t);
-        SwingExecutor.schedule(() -> {
-            l.setText(t);
-            l.revalidate();
-            l.repaint();
-        }, 32, TimeUnit.MILLISECONDS);
     }
 
 
