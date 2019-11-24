@@ -259,7 +259,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         c.fill = GridBagConstraints.BOTH;
         comp.add(imagesPanel, c);
 
-        tagStats = new JTagStatsView();
+        tagStats = new JFilterView(filterTags);
         c.gridx = 3;
         c.gridy = 3;
         c.gridwidth = 1;
@@ -267,7 +267,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
         c.weighty = 1.0;
         c.weightx = 1.0;
         c.fill = GridBagConstraints.BOTH;
-        //comp.add(new JScrollPane(tagStats), c);
+        comp.add(new JScrollPane(tagStats), c);
 
         return comp;
     }
