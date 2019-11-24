@@ -285,7 +285,7 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
 
             JPanel panel = new JPanel(new BorderLayout());
             JXTreeTable jTable = new JXTreeTable(tm);
-            jTable.expandAll();
+            //jTable.expandAll();
             jTable.setAutoCreateRowSorter(true);
             JScrollPane jScrollPane = new JScrollPane(jTable);
             panel.add(jScrollPane, BorderLayout.CENTER);
