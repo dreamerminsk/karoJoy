@@ -282,12 +282,13 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
 
             JPanel panel = new JPanel(new BorderLayout());
             JXTreeTable jTable = new JXTreeTable(tm);
+            jTable.expandAll();
             jTable.setAutoCreateRowSorter(true);
             JScrollPane jScrollPane = new JScrollPane(jTable);
             panel.add(jScrollPane, BorderLayout.CENTER);
             dialog.setContentPane(panel);
             panel.setBorder(new JPopupMenu().getBorder());
-            dialog.setSize(panel.getPreferredSize());
+            dialog.setSize(400, 400);
         }
 
         @Override
@@ -303,7 +304,6 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
         }
 
         public void windowGainedFocus(WindowEvent e) {
-            // NO-OP
         }
 
         public void windowLostFocus(WindowEvent e) {

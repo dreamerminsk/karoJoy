@@ -18,6 +18,9 @@ public class PublishedTreeTableModel extends AbstractTreeTableModel {
 
     public PublishedTreeTableModel() {
         super("ROOT");
+        for (int i = 2019; i > 2014; i--) {
+            years.add(Year.of(i));
+        }
     }
 
     @Override
@@ -50,7 +53,7 @@ public class PublishedTreeTableModel extends AbstractTreeTableModel {
         } else if (node.getClass().isAssignableFrom(YearMonth.class)) {
             YearMonth ym = (YearMonth) node;
             if (column == 0) {
-                return ym.getMonthValue() + ". " + ym.getMonth().name();
+                return ym.getMonth().name();
             } else {
                 return dayStats.entrySet().stream()
                         .filter(dayStat -> dayStat.getKey().getYear() == ym.getYear())
