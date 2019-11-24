@@ -40,6 +40,7 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
     private JLabel tasks;
     private JLabel pubs;
     private JLabel tagStats;
+    private TreeMessagePopup pubPopup;
 
     public UpdaterView(UpdateStats stats) {
         super(new FlowLayout(FlowLayout.LEFT));
@@ -87,11 +88,13 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
                 } while (parent != null);
 
                 Point loc = parent.getLocationOnScreen();
-                TreeMessagePopup mp = new TreeMessagePopup((Frame) parent,
-                        stats.getPubTableModel(),
-                        loc.x + parent.getWidth() / 3,
-                        loc.y + parent.getHeight() / 3);
-                mp.show();
+                if (pubPopup == null) {
+                    pubPopup = new TreeMessagePopup((Frame) parent,
+                            stats.getPubTableModel(),
+                            loc.x + parent.getWidth() / 3,
+                            loc.y + parent.getHeight() / 3);
+                }
+                pubPopup.show();
             }
         });
         add(pubs);
@@ -288,7 +291,7 @@ public class UpdaterView extends JPanel implements PropertyChangeListener {
             panel.add(jScrollPane, BorderLayout.CENTER);
             dialog.setContentPane(panel);
             panel.setBorder(new JPopupMenu().getBorder());
-            dialog.setSize(400, 400);
+            dialog.setSize(300, 400);
         }
 
         @Override
