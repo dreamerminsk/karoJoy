@@ -9,6 +9,8 @@ import java.awt.event.MouseListener;
 
 public class JTagLabel extends JLabel implements MouseListener {
 
+    private List<TagListener> listeners = new ArrayList<>();
+
     private Tag tag;
 
     public JTagLabel(Tag tag) {
@@ -39,7 +41,7 @@ public class JTagLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        listeners.stream().forEach(l->l.tagSelected(tag));
     }
 
     @Override
@@ -60,5 +62,13 @@ public class JTagLabel extends JLabel implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
         setForeground(Color.BLACK);
+    }
+
+    public void addTagListener(TagListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeTagListener(TagListener listener) {
+        listeners.remove(listener);
     }
 }
