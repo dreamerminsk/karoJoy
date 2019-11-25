@@ -56,7 +56,7 @@ public class JFilterView extends JPanel implements MouseListener {
         if (source.getClass().isAssignableFrom(JLabel.class)) {
             JLabel label = (JLabel) source;
             List<Tag> tags = filterTags.stream()
-                    .filter(t -> t.getTag().equalsIgnoreCase(label.getText())).collect(Collectors.toList());
+                    .filter(t -> t.getTag().equalsIgnoreCase(label.getText().trim())).collect(Collectors.toList());
             tags.forEach(filterTags::remove);
             update();
         }
