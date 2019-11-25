@@ -22,7 +22,7 @@ public class JFilterView extends JPanel implements MouseListener {
         filterTags.forEach(t -> {
             JLabel lt = new JLabel(t.getTag());
             lt.setFont(lt.getFont().deriveFont(18.0f));
-            lt.setBorder(UIManager.getBorder("ScrollBar.border"));
+            lt.setBorder(UIManager.getBorder("ScrollPane.border"));
             lt.addMouseListener(this);
             add(lt);
         });
