@@ -1,3 +1,7 @@
+package cc.joyreactor.events;
+
+import cc.joyreactor.data.Tag;
+
 public interface TagListener {
-    public void tagSelected(Tag tag);
+    void tagSelected(Tag tag);
 }
