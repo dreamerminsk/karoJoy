@@ -7,6 +7,7 @@ import cc.joyreactor.data.User;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.sqlite.JDBC;
+import org.sqlite.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class Source {
 
@@ -264,13 +266,24 @@ public class Source {
     }
 
     public Post getPrevLatestPost(ZonedDateTime sinse) {
-        return getPrevLatestPost(sinse, 1);
+        return getPrevLatestPost(sinse, 1, new ArrayList<>());
     }
 
-    public Post getPrevLatestPost(ZonedDateTime sinse, int delta) {
+    public Post getPrevLatestPost(ZonedDateTime sinse, int delta, List<Tag> tags) {
         String sql = "SELECT * FROM jr_posts WHERE published>? ORDER BY published ASC LIMIT " + delta + ";";
+        if (!tags.isEmpty()) {
+            sql = "SELECT * FROM jr_posts AS p INNER JOIN jr_post_tags AS pt ON p.post_id=pt.post_id " +
+                    "WHERE published>? AND pt.tag_id in (" +
+                    StringUtils.join(tags.stream().map(t -> "?").collect(Collectors.toList()), ",") +
+                    ") ORDER BY published DESC LIMIT " + delta + ";";
+        }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, sinse.toString());
+            if (!tags.isEmpty()) {
+                for (int i = 0; i < tags.size(); i++) {
+                    statement.setInt(2 + i, tags.get(i).getId());
+                }
+            }
             Post post = recordToPost(statement);
             if (post != null) return post;
         } catch (SQLException e) {
@@ -281,13 +294,24 @@ public class Source {
     }
 
     public Post getLatestPost(ZonedDateTime sinse) {
-        return getLatestPost(sinse, 1);
+        return getLatestPost(sinse, 1, new ArrayList<>());
     }
 
-    public Post getLatestPost(ZonedDateTime sinse, int delta) {
+    public Post getLatestPost(ZonedDateTime sinse, int delta, List<Tag> tags) {
         String sql = "SELECT * FROM jr_posts WHERE published<? ORDER BY published DESC LIMIT " + delta + ";";
+        if (!tags.isEmpty()) {
+            sql = "SELECT * FROM jr_posts AS p INNER JOIN jr_post_tags AS pt ON p.post_id=pt.post_id " +
+                    "WHERE published<? AND pt.tag_id in (" +
+                    StringUtils.join(tags.stream().map(t -> "?").collect(Collectors.toList()), ",") +
+                    ") ORDER BY published DESC LIMIT " + delta + ";";
+        }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, sinse.toString());
+            if (!tags.isEmpty()) {
+                for (int i = 0; i < tags.size(); i++) {
+                    statement.setInt(2 + i, tags.get(i).getId());
+                }
+            }
             Post post = recordToPost(statement);
             if (post != null) return post;
         } catch (SQLException e) {

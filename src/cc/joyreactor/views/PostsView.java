@@ -38,8 +38,8 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
 
     private final PostsModel model;
     private final ExecutorService ES = Executors.newSingleThreadScheduledExecutor();
-    private Post current;
     private final java.util.List<Tag> filterTags = new ArrayList<>();
+    private Post current;
     private JLabel userLabel;
     private Source source;
     private JLabel ratingLabel;
@@ -97,7 +97,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
             jbNext10.setEnabled(false);
             jbPrev.setEnabled(false);
             jbNext.setEnabled(false);
-            CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished(), 10))
+            CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished(), 10, tagStats.getFilterTags()))
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
@@ -114,7 +114,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
             jbNext10.setEnabled(false);
             jbPrev.setEnabled(false);
             jbNext.setEnabled(false);
-            CompletableFuture.supplyAsync(() -> source.getPrevLatestPost(current.getPublished(), 10))
+            CompletableFuture.supplyAsync(() -> source.getPrevLatestPost(current.getPublished(), 10, tagStats.getFilterTags()))
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
@@ -132,7 +132,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
             jbNext10.setEnabled(false);
             jbPrev.setEnabled(false);
             jbNext.setEnabled(false);
-            CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished()))
+            CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished(), 1, tagStats.getFilterTags()))
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
@@ -149,7 +149,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
             jbNext10.setEnabled(false);
             jbPrev.setEnabled(false);
             jbNext.setEnabled(false);
-            CompletableFuture.supplyAsync(() -> source.getPrevLatestPost(current.getPublished()))
+            CompletableFuture.supplyAsync(() -> source.getPrevLatestPost(current.getPublished(), 1, tagStats.getFilterTags()))
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
