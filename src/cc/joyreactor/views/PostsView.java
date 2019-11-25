@@ -3,6 +3,7 @@ package cc.joyreactor.views;
 import cc.joyreactor.Source;
 import cc.joyreactor.data.Post;
 import cc.joyreactor.data.Tag;
+import cc.joyreactor.events.TagListener;
 import cc.joyreactor.models.PostsModel;
 import cc.joyreactor.utils.Strings;
 import org.imgscalr.Scalr;
@@ -33,7 +34,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class PostsView extends JPanel implements PropertyChangeListener {
+public class PostsView extends JPanel implements PropertyChangeListener, TagListener {
 
     private final PostsModel model;
     private final ExecutorService ES = Executors.newSingleThreadScheduledExecutor();
@@ -232,6 +233,7 @@ public class PostsView extends JPanel implements PropertyChangeListener {
 
 
         tagsPanel = new JTagPanel(new ArrayList<>());
+        tagsPanel.addTagListener(this);
         c.gridx = 0;
         c.gridy = 1;
         c.gridwidth = 4;
@@ -417,4 +419,10 @@ public class PostsView extends JPanel implements PropertyChangeListener {
     }
 
 
+    @Override
+    public void tagSelected(Tag tag) {
+        SwingUtilities.invokeLater(() -> {
+            tagStats.add(tag);
+        });
+    }
 }

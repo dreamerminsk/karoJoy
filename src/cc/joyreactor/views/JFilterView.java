@@ -13,4 +13,23 @@ public class JFilterView extends JPanel {
         super(new WrapLayout());
         this.filterTags = filterTags;
     }
+
+    private void update() {
+        removeAll();
+        filterTags.forEach(t -> {
+            JLabel lt = new JLabel(t.getTag());
+            add(lt);
+        });
+        revalidate();
+        repaint();
+    }
+
+    public void add(Tag tag) {
+        filterTags.add(tag);
+        update();
+    }
+
+    public void removeTag(Tag tag) {
+        filterTags.remove(tag);
+    }
 }
