@@ -44,7 +44,7 @@ public class JTagLabel extends JLabel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        listeners.stream().forEach(l->l.tagSelected(tag));
+        listeners.forEach(l -> l.tagSelected(tag));
     }
 
     @Override
