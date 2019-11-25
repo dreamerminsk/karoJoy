@@ -4,9 +4,12 @@ import cc.joyreactor.data.Tag;
 import org.jdesktop.swingx.WrapLayout;
 
 import javax.swing.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class JFilterView extends JPanel {
+public class JFilterView extends JPanel implements MouseListener {
     private final List<Tag> filterTags;
 
     public JFilterView(List<Tag> filterTags) {
@@ -18,6 +21,9 @@ public class JFilterView extends JPanel {
         removeAll();
         filterTags.forEach(t -> {
             JLabel lt = new JLabel(t.getTag());
+            lt.setFont(lt.getFont().deriveFont(18.0f));
+            lt.setBorder(UIManager.getBorder("ScrollBar.border"));
+            lt.addMouseListener(this);
             add(lt);
         });
         revalidate();
@@ -25,11 +31,48 @@ public class JFilterView extends JPanel {
     }
 
     public void add(Tag tag) {
-        filterTags.add(tag);
-        update();
+        List<Tag> tags = filterTags.stream().filter(t ->
+                t.getTag().equalsIgnoreCase(tag.getTag())).collect(Collectors.toList());
+        if (tags.isEmpty()) {
+            filterTags.add(tag);
+            update();
+        }
     }
 
     public void removeTag(Tag tag) {
         filterTags.remove(tag);
+        update();
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        Object source = e.getSource();
+        if (source.getClass().isAssignableFrom(JLabel.class)) {
+            JLabel label = (JLabel) source;
+            List<Tag> tags = filterTags.stream()
+                    .filter(t -> t.getTag().equalsIgnoreCase(label.getText())).collect(Collectors.toList());
+            tags.forEach(filterTags::remove);
+            update();
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }
