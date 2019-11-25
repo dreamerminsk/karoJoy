@@ -273,6 +273,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
 
     private void update() {
         if (current == null) return;
+        if (current.getUser() == null) return;
         //userLabel.setText(current.getUser().getName());
         CompletableFuture.runAsync(() -> updateLabel(userLabel, current.getUser().getName()), ES);
         pubLabel.setText(current.getPublished().format(DateTimeFormatter.ofPattern("d MMM uuuu HH:mm:ss")) + " ");
