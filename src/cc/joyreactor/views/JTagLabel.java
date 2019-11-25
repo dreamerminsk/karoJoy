@@ -1,11 +1,14 @@
 package cc.joyreactor.views;
 
 import cc.joyreactor.data.Tag;
+import cc.joyreactor.events.TagListener;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JTagLabel extends JLabel implements MouseListener {
 
