@@ -17,6 +17,7 @@ import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -176,38 +177,40 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
             //}).thenAcceptAsync(img -> userLabel.setIcon(new ImageIcon(img)));
         }, ES).thenAcceptAsync(img -> updateImage(userLabel, img), ES);
 
-        CompletableFuture.supplyAsync(() -> source.getPostImages(current.getId()), ES)
-                .thenAcceptAsync(images -> images.stream().sequential().forEach((image) -> {
-                    try {
-                        CompletableFuture.supplyAsync(() -> {
-                            try {
-                                return ImageIO.read(new URL(image.getRef()));
-                            } catch (IOException e) {
-                                return null;
-                            }
-                        }, ES).thenApplyAsync((bufferedImage) ->
-                                Scalr.resize(bufferedImage,
-                                        Scalr.Method.ULTRA_QUALITY,
-                                        Scalr.Mode.AUTOMATIC,
-                                        512, 512), ES)
-                                .thenAcceptAsync((pic) -> SwingUtilities.invokeLater(() ->
-                                {
-                                    imagesMenu.add(new JLabel(new ImageIcon(pic)));
-                                    imagesPanel.revalidate();
-                                    imagesPanel.repaint();
-                                }), ES);
-                        JLabel label = new JLabel(Strings.getLastSplitComponent(
-                                URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"));
-                        label.setFont(label.getFont().deriveFont(16.0f));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }), ES).thenRunAsync(() -> SwingUtilities.invokeLater(() -> imagesBox.revalidate()), ES);
-
         CompletableFuture.supplyAsync(() -> source.getPostTags(current.getId()), ES)
                 .thenAcceptAsync(tags -> SwingUtilities.invokeLater(() -> tagsPanel.setTags(tags)), ES);
 
-
+        CompletableFuture.supplyAsync(() -> source.getPostImages(current.getId()), ES)
+                .thenAcceptAsync(images -> images.stream().sequential().forEach((image) -> {
+                    CompletableFuture.supplyAsync(() -> {
+                        try {
+                            return ImageIO.read(new URL(image.getRef()));
+                        } catch (IOException e) {
+                            return null;
+                        }
+                    }, ES).thenApplyAsync((bufferedImage) ->
+                            Scalr.resize(bufferedImage,
+                                    Scalr.Method.ULTRA_QUALITY,
+                                    Scalr.Mode.AUTOMATIC,
+                                    512, 512), ES)
+                            .thenAcceptAsync((pic) -> SwingUtilities.invokeLater(() ->
+                            {
+                                JLabel jLabel = null;
+                                try {
+                                    jLabel = new JLabel(Strings.getLastSplitComponent(
+                                            URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"),
+                                            new ImageIcon(pic), SwingConstants.LEFT);
+                                    jLabel.setHorizontalTextPosition(JLabel.CENTER);
+                                    jLabel.setVerticalTextPosition(JLabel.TOP);
+                                    jLabel.setFont(jLabel.getFont().deriveFont(16.0f));
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
+                                imagesMenu.add(jLabel);
+                                imagesPanel.revalidate();
+                                imagesPanel.repaint();
+                            }), ES);
+                }), ES).thenRunAsync(() -> SwingUtilities.invokeLater(() -> imagesBox.revalidate()), ES);
     }
 
     private void updateImage(JLabel userLabel, BufferedImage img) {
