@@ -101,10 +101,6 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
-                        jbPrev10.setEnabled(true);
-                        jbNext10.setEnabled(true);
-                        jbPrev.setEnabled(true);
-                        jbNext.setEnabled(true);
                     }));
         });
 
@@ -118,10 +114,6 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
-                        jbPrev10.setEnabled(true);
-                        jbNext10.setEnabled(true);
-                        jbPrev.setEnabled(true);
-                        jbNext.setEnabled(true);
                     }));
         });
 
@@ -136,10 +128,6 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
-                        jbPrev10.setEnabled(true);
-                        jbNext10.setEnabled(true);
-                        jbPrev.setEnabled(true);
-                        jbNext.setEnabled(true);
                     }));
         });
 
@@ -153,10 +141,6 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
                     .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
                         current = p;
                         update();
-                        jbPrev10.setEnabled(true);
-                        jbNext10.setEnabled(true);
-                        jbPrev.setEnabled(true);
-                        jbNext.setEnabled(true);
                     }));
         });
 
@@ -272,6 +256,10 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
     }
 
     private void update() {
+        jbPrev10.setEnabled(true);
+                        jbNext10.setEnabled(true);
+                        jbPrev.setEnabled(true);
+                        jbNext.setEnabled(true);
         if (current == null) return;
         if (current.getUser() == null) return;
         //userLabel.setText(current.getUser().getName());
