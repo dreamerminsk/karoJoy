@@ -48,10 +48,6 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
     private JFilterView tagStats;
     private JPanel imagesMenu;
     private JPanel crPanel;
-    private JButton jbNext;
-    private JButton jbPrev;
-    private JButton jbNext10;
-    private JButton jbPrev10;
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -83,78 +79,13 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         c.anchor = GridBagConstraints.FIRST_LINE_START;
         comp.add(userLabel, c);
 
-
-        jbNext = new JButton(">");
-        jbPrev = new JButton("<");
-        jbNext10 = new JButton(">>");
-        jbPrev10 = new JButton("<<");
-
-        jbNext10.setFont(jbNext10.getFont().deriveFont(Font.ITALIC, 8.0f));
-        jbNext10.addActionListener(e -> {
-            jbPrev10.setEnabled(false);
-            jbNext10.setEnabled(false);
-            jbPrev.setEnabled(false);
-            jbNext.setEnabled(false);
-            CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished(), 10, tagStats.getFilterTags()))
-                    .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
-                        current = p;
-                        update();
-                    }));
-        });
-
-        jbPrev10.setFont(jbPrev10.getFont().deriveFont(Font.ITALIC, 8.0f));
-        jbPrev10.addActionListener(e -> {
-            jbPrev10.setEnabled(false);
-            jbNext10.setEnabled(false);
-            jbPrev.setEnabled(false);
-            jbNext.setEnabled(false);
-            CompletableFuture.supplyAsync(() -> source.getPrevLatestPost(current.getPublished(), 10, tagStats.getFilterTags()))
-                    .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
-                        current = p;
-                        update();
-                    }));
-        });
-
-
-        jbNext.setFont(jbNext.getFont().deriveFont(Font.ITALIC, 8.0f));
-        jbNext.addActionListener(e -> {
-            jbPrev10.setEnabled(false);
-            jbNext10.setEnabled(false);
-            jbPrev.setEnabled(false);
-            jbNext.setEnabled(false);
-            CompletableFuture.supplyAsync(() -> source.getLatestPost(current.getPublished(), 1, tagStats.getFilterTags()))
-                    .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
-                        current = p;
-                        update();
-                    }));
-        });
-
-        jbPrev.setFont(jbPrev.getFont().deriveFont(Font.ITALIC, 8.0f));
-        jbPrev.addActionListener(e -> {
-            jbPrev10.setEnabled(false);
-            jbNext10.setEnabled(false);
-            jbPrev.setEnabled(false);
-            jbNext.setEnabled(false);
-            CompletableFuture.supplyAsync(() -> source.getPrevLatestPost(current.getPublished(), 1, tagStats.getFilterTags()))
-                    .thenAcceptAsync((p) -> SwingUtilities.invokeLater(() -> {
-                        current = p;
-                        update();
-                    }));
-        });
-
         pubLabel = new LocalDateTimeSpinner();
-        JPanel pubPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        pubPanel.add(jbPrev10);
-        pubPanel.add(jbPrev);
-        pubPanel.add(pubLabel);
-        pubPanel.add(jbNext);
-        pubPanel.add(jbNext10);
         c.gridx = 1;
         c.gridy = 0;
         c.insets = new Insets(5, 5, 5, 5);
         c.anchor = GridBagConstraints.LAST_LINE_START;
-        comp.add(pubPanel, c);
+        comp.add(pubLabel, c);
 
 
         crPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
@@ -226,10 +157,6 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
     }
 
     private void update() {
-        jbPrev10.setEnabled(true);
-        jbNext10.setEnabled(true);
-        jbPrev.setEnabled(true);
-        jbNext.setEnabled(true);
         if (current == null) return;
         if (current.getUser() == null) return;
         //userLabel.setText(current.getUser().getName());
