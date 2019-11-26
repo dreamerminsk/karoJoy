@@ -11,9 +11,6 @@ import org.imgscalr.Scalr;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -26,13 +23,10 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class PostsView extends JPanel implements PropertyChangeListener, TagListener {
 
@@ -45,7 +39,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
     private JLabel ratingLabel;
     private BufferedImage defaultPic;
     private JTagPanel tagsPanel;
-    private JLabel pubLabel;
+    private LocalDateTimeSpinner pubLabel;
     private JPanel imagesPanel;
     private JLabel postImage;
     private JPanel postImages;
@@ -148,35 +142,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
                     }));
         });
 
-        pubLabel = new JLabel("");
-        pubLabel.setFont(pubLabel.getFont().deriveFont(Font.PLAIN | Font.ITALIC, 16.0f));
-        pubLabel.addMouseMotionListener(new MouseMotionListener() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                FontMetrics metrics = getFontMetrics(pubLabel.getFont());
-
-                Graphics g = pubLabel.getGraphics();
-                AtomicReference<String> text = new AtomicReference<>("");
-                AtomicBoolean isFirst = new AtomicBoolean(true);
-                pubLabel.getText().chars().forEachOrdered(chr -> {
-                    text.updateAndGet(v -> v + (char) chr);
-                    Rectangle2D stringBounds = metrics.getStringBounds(text.get(), g);
-                    if (stringBounds.getWidth() > e.getPoint().getX()) {
-                        if (isFirst.getAndSet(false)) {
-                            JOptionPane.showMessageDialog(null, stringBounds + ", " + e.getPoint() + ", " + text);
-                        }
-
-                    }
-                });
-                g.dispose();
-
-            }
-        });
+        pubLabel = new LocalDateTimeSpinner();
         JPanel pubPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         pubPanel.add(jbPrev10);
@@ -268,7 +234,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         if (current.getUser() == null) return;
         //userLabel.setText(current.getUser().getName());
         CompletableFuture.runAsync(() -> updateLabel(userLabel, current.getUser().getName()), ES);
-        pubLabel.setText(current.getPublished().format(DateTimeFormatter.ofPattern("d MMM uuuu HH:mm:ss")) + " ");
+        pubLabel.setDt(current.getPublished().toLocalDateTime());
         ratingLabel.setText(current.getRating().toString() + " ");
         commentsLabel.setText(current.getComments().toString() + " ");
         imagesBox.removeAll();
