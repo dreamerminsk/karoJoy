@@ -25,14 +25,22 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
 public class PostsView extends JPanel implements PropertyChangeListener, TagListener {
 
     private final PostsModel model;
-    private final ExecutorService ES = Executors.newSingleThreadScheduledExecutor();
+
+    private final AtomicInteger nextTask = new AtomicInteger(0);
+    private final ScheduledExecutorService ES = Executors.newSingleThreadScheduledExecutor();
     private final java.util.List<Tag> filterTags = new ArrayList<>();
     private Post current;
     private JLabel userLabel;
@@ -49,6 +57,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
     private JFilterView tagStats;
     private JPanel imagesMenu;
     private JPanel crPanel;
+    private Map<String, JLabel> refImages = new TreeMap<>();
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -60,6 +69,19 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         if (current != null) {
             update();
         }
+        ES.scheduleWithFixedDelay(() -> {
+            int task = nextTask.getAndSet(0);
+            Post p = null;
+            if (task > 0) {
+                p = source.getLatestPost(current.getPublished(), task, filterTags);
+            } else if (task < 0) {
+                p = source.getPrevLatestPost(current.getPublished(), -task, filterTags);
+            }
+            if (p != null && p.getPublished() != null) {
+                current = p;
+                SwingUtilities.invokeLater(this::update);
+            }
+        }, 1, 1, TimeUnit.SECONDS);
     }
 
     private void ui() throws IOException {
@@ -154,6 +176,8 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         c.fill = GridBagConstraints.BOTH;
         comp.add(new JScrollPane(tagStats), c);
 
+        comp.addMouseWheelListener(e -> nextTask.set(e.getWheelRotation()));
+
         return comp;
     }
 
@@ -167,6 +191,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         commentsLabel.setText(current.getComments().toString() + " ");
         imagesBox.removeAll();
         imagesMenu.removeAll();
+        refImages.clear();
 
         CompletableFuture.supplyAsync(() -> {
             try {
@@ -181,36 +206,51 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
                 .thenAcceptAsync(tags -> SwingUtilities.invokeLater(() -> tagsPanel.setTags(tags)), ES);
 
         CompletableFuture.supplyAsync(() -> source.getPostImages(current.getId()), ES)
-                .thenAcceptAsync(images -> images.stream().sequential().forEach((image) -> {
-                    CompletableFuture.supplyAsync(() -> {
+                .thenAcceptAsync(images -> {
+                    images.stream().sequential().forEach(image -> {
+                        JLabel jLabel = null;
                         try {
-                            return ImageIO.read(new URL(image.getRef()));
-                        } catch (IOException e) {
-                            return null;
+                            jLabel = new JLabel(Strings.getLastSplitComponent(
+                                    URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"),
+                                    null, SwingConstants.LEFT);
+                            jLabel.setHorizontalTextPosition(JLabel.CENTER);
+                            jLabel.setVerticalTextPosition(JLabel.TOP);
+                            jLabel.setFont(jLabel.getFont().deriveFont(14.0f));
+                            jLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
+                            BufferedImage bi = new BufferedImage(512, 512, TYPE_INT_ARGB);
+                            jLabel.setIcon(new ImageIcon(bi));
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
                         }
-                    }, ES).thenApplyAsync((bufferedImage) ->
-                            Scalr.resize(bufferedImage,
-                                    Scalr.Method.ULTRA_QUALITY,
-                                    Scalr.Mode.AUTOMATIC,
-                                    512, 512), ES)
-                            .thenAcceptAsync((pic) -> SwingUtilities.invokeLater(() ->
-                            {
-                                JLabel jLabel = null;
-                                try {
-                                    jLabel = new JLabel(Strings.getLastSplitComponent(
-                                            URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"),
-                                            new ImageIcon(pic), SwingConstants.LEFT);
-                                    jLabel.setHorizontalTextPosition(JLabel.CENTER);
-                                    jLabel.setVerticalTextPosition(JLabel.TOP);
-                                    jLabel.setFont(jLabel.getFont().deriveFont(16.0f));
-                                } catch (UnsupportedEncodingException e) {
-                                    e.printStackTrace();
-                                }
-                                imagesMenu.add(jLabel);
-                                imagesPanel.revalidate();
-                                imagesPanel.repaint();
-                            }), ES);
-                }), ES).thenRunAsync(() -> SwingUtilities.invokeLater(() -> imagesBox.revalidate()), ES);
+                        imagesMenu.add(jLabel);
+                        JLabel finalJLabel = jLabel;
+                        loadImage(image.getRef()).thenAcceptAsync(pic -> {
+                            if (pic != null) {
+                                SwingUtilities.invokeLater(() ->
+                                {
+                                    finalJLabel.setIcon(new ImageIcon(pic));
+                                    imagesPanel.revalidate();
+                                    imagesPanel.repaint();
+                                });
+                            }
+                        });
+                    });
+
+                }).thenRunAsync(() -> SwingUtilities.invokeLater(() -> imagesBox.revalidate()), ES);
+    }
+
+    private CompletableFuture<BufferedImage> loadImage(String ref) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return ImageIO.read(new URL(ref));
+            } catch (IOException e) {
+                return null;
+            }
+        }).thenApplyAsync((bufferedImage) ->
+                Scalr.resize(bufferedImage,
+                        Scalr.Method.ULTRA_QUALITY,
+                        Scalr.Mode.AUTOMATIC,
+                        512, 512));
     }
 
     private void updateImage(JLabel userLabel, BufferedImage img) {

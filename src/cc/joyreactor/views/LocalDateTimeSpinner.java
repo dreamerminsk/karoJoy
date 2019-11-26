@@ -39,7 +39,7 @@ public class LocalDateTimeSpinner extends JPanel {
         setStyle(hourLabel);
         add(hourLabel);
 
-        JLabel timeDivLabel = new JLabel(":");
+        JLabel timeDivLabel = new JLabel(": ");
         setStyle(timeDivLabel);
         add(timeDivLabel);
 
@@ -48,7 +48,7 @@ public class LocalDateTimeSpinner extends JPanel {
         add(minuteLabel);
 
 
-        JLabel timeDivLabel2 = new JLabel(":");
+        JLabel timeDivLabel2 = new JLabel(": ");
         setStyle(timeDivLabel2);
         add(timeDivLabel2);
 
