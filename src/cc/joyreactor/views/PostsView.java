@@ -54,6 +54,10 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
     private JFilterView tagStats;
     private JPanel imagesMenu;
     private JPanel crPanel;
+    private JButton jbNext;
+    private JButton jbPrev;
+    private JButton jbNext10;
+    private JButton jbPrev10;
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -86,10 +90,10 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         comp.add(userLabel, c);
 
 
-        JButton jbNext = new JButton(">");
-        JButton jbPrev = new JButton("<");
-        JButton jbNext10 = new JButton(">>");
-        JButton jbPrev10 = new JButton("<<");
+        jbNext = new JButton(">");
+        jbPrev = new JButton("<");
+        jbNext10 = new JButton(">>");
+        jbPrev10 = new JButton("<<");
 
         jbNext10.setFont(jbNext10.getFont().deriveFont(Font.ITALIC, 8.0f));
         jbNext10.addActionListener(e -> {
