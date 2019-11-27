@@ -1,0 +1,22 @@
+<component name="ArtifactManager">
+  <artifact name="karoJoy:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/karoJoy_jar</output-path>
+    <root id="root">
+      <element id="archive" name="karoJoy.jar">
+        <element id="module-output" name="karoJoy" />
+      </element>
+      <element id="library" level="project" name="org.jsoup:jsoup:1.12.1" />
+      <element id="library" level="project" name="org.swinglabs.swingx:swingx-all:1.6.5-1" />
+      <element id="library" level="project" name="org.imgscalr:imgscalr-lib:4.2" />
+      <element id="library" level="project" name="com.google.guava:guava:27.1-jre" />
+      <element id="library" level="project" name="io.dropwizard.metrics:metrics-core:3.1.2" />
+      <element id="library" level="project" name="com.weblookandfeel:weblaf-ui:1.2.10" />
+      <element id="library" level="project" name="org.xerial:sqlite-jdbc:3.27.2" />
+      <element id="library" level="project" name="KotlinJavaRuntime" />
+      <element id="library" level="project" name="com.squareup.okhttp3:okhttp:3.14.0" />
+      <element id="library" level="project" name="org.apache.commons:commons-lang3:3.9" />
+      <element id="library" level="project" name="org.apache.commons:commons-collections4:4.4" />
+      <element id="library" level="project" name="org.iq80.leveldb:leveldb:0.12" />
+    </root>
+  </artifact>
+</component>

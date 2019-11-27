@@ -1,5 +1,7 @@
 package cc.joyreactor.views;
 
+import com.alee.extended.layout.HorizontalFlowLayout;
+
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
@@ -18,7 +20,7 @@ public class LocalDateTimeSpinner extends JPanel {
     private JLabel secondLabel;
 
     public LocalDateTimeSpinner() {
-        super(new FlowLayout(FlowLayout.LEFT));
+        super(new HorizontalFlowLayout(0, false));
         initUI();
     }
 

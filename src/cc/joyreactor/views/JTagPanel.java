@@ -3,23 +3,19 @@ package cc.joyreactor.views;
 import cc.joyreactor.data.Tag;
 import cc.joyreactor.events.TagListener;
 import com.alee.extended.layout.HorizontalFlowLayout;
-import com.alee.laf.panel.WebPanel;
-import com.alee.managers.style.StyleId;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class JTagPanel extends WebPanel implements TagListener {
+public class JTagPanel extends JPanel implements TagListener {
 
     private List<TagListener> listeners = new ArrayList<>();
 
     public JTagPanel(List<Tag> tags) {
-        super(StyleId.panelDecorated, new HorizontalFlowLayout(4, true));
+        super(new HorizontalFlowLayout(4, false));
         update(tags);
-        setPadding(5);
-        setPreferredHeight(40);
     }
 
     public void setTags(List<Tag> tags) {

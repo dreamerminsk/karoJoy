@@ -5,7 +5,8 @@ import cc.joyreactor.data.Post;
 import cc.joyreactor.data.Tag;
 import cc.joyreactor.events.TagListener;
 import cc.joyreactor.models.PostsModel;
-import cc.joyreactor.utils.Strings;
+import com.alee.extended.image.WebImageGallery;
+import com.alee.laf.scroll.WebScrollPane;
 import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
@@ -17,10 +18,7 @@ import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -32,8 +30,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
 public class PostsView extends JPanel implements PropertyChangeListener, TagListener {
 
@@ -58,6 +54,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
     private JPanel imagesMenu;
     private JPanel crPanel;
     private Map<String, JLabel> refImages = new TreeMap<>();
+    private WebImageGallery gallery;
 
     public PostsView(PostsModel model) throws SQLException, IOException {
         super(new BorderLayout());
@@ -149,12 +146,11 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         //c.weighty = 1.0;
         //c.weightx = 1.0;
         c.fill = GridBagConstraints.BOTH;
-        comp.add(tagsPanel, c);
+        comp.add(new WebScrollPane(tagsPanel), c);
 
         imagesPanel = new JPanel(new BorderLayout());
         imagesMenu = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        imagesBox = Box.createVerticalBox();
-        postImage = new JLabel();
+        gallery = new WebImageGallery();
         //imagesPanel.add(new JScrollPane(imagesMenu), BorderLayout.PAGE_START);
         imagesPanel.add(new JScrollPane(imagesMenu), BorderLayout.CENTER);
         c.gridx = 0;
@@ -163,8 +159,8 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         c.insets = new Insets(5, 5, 5, 5);
         c.weighty = 1.0;
         c.weightx = 2.0;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        comp.add(imagesPanel, c);
+        c.fill = GridBagConstraints.BOTH;
+        comp.add(gallery, c);
 
         tagStats = new JFilterView(filterTags);
         c.gridx = 3;
@@ -189,9 +185,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         pubLabel.setDt(current.getPublished().toLocalDateTime());
         ratingLabel.setText(current.getRating().toString() + " ");
         commentsLabel.setText(current.getComments().toString() + " ");
-        imagesBox.removeAll();
-        imagesMenu.removeAll();
-        refImages.clear();
+        gallery.removeAll();
 
         CompletableFuture.supplyAsync(() -> {
             try {
@@ -207,34 +201,16 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
 
         CompletableFuture.supplyAsync(() -> source.getPostImages(current.getId()), ES)
                 .thenAcceptAsync(images -> {
-                    images.stream().sequential().forEach(image -> {
-                        JLabel jLabel = null;
-                        try {
-                            jLabel = new JLabel(Strings.getLastSplitComponent(
-                                    URLDecoder.decode(image.getRef(), StandardCharsets.UTF_8.name()), "/"),
-                                    null, SwingConstants.LEFT);
-                            jLabel.setHorizontalTextPosition(JLabel.CENTER);
-                            jLabel.setVerticalTextPosition(JLabel.TOP);
-                            jLabel.setFont(jLabel.getFont().deriveFont(14.0f));
-                            jLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
-                            BufferedImage bi = new BufferedImage(368, 368, TYPE_INT_ARGB);
-                            jLabel.setIcon(new ImageIcon(bi));
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
+                    images.stream().sequential().forEach(image -> loadImage(image.getRef()).thenAcceptAsync(pic -> {
+                        if (pic != null) {
+                            SwingUtilities.invokeLater(() ->
+                            {
+                                gallery.addImage(new ImageIcon(pic));
+                                imagesPanel.revalidate();
+                                imagesPanel.repaint();
+                            });
                         }
-                        imagesMenu.add(jLabel);
-                        JLabel finalJLabel = jLabel;
-                        loadImage(image.getRef()).thenAcceptAsync(pic -> {
-                            if (pic != null) {
-                                SwingUtilities.invokeLater(() ->
-                                {
-                                    finalJLabel.setIcon(new ImageIcon(pic));
-                                    imagesPanel.revalidate();
-                                    imagesPanel.repaint();
-                                });
-                            }
-                        });
-                    });
+                    }));
 
                 }).thenRunAsync(() -> SwingUtilities.invokeLater(() -> imagesBox.revalidate()), ES);
     }

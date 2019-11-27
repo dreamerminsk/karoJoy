@@ -1,12 +1,15 @@
 Manifest-Version: 1.0
-Class-Path: metrics-core-3.1.2.jar slf4j-api-1.7.7.jar jsoup-1.12.1.ja
- r commons-lang3-3.9.jar leveldb-0.12.jar leveldb-api-0.12.jar guava-2
- 1.0.jar commons-collections4-4.4.jar guava-27.1-jre.jar failureaccess
- -1.0.1.jar listenablefuture-9999.0-empty-to-avoid-conflict-with-guava
- .jar jsr305-3.0.2.jar checker-qual-2.5.2.jar error_prone_annotations-
- 2.2.0.jar j2objc-annotations-1.1.jar animal-sniffer-annotations-1.17.
- jar kotlin-stdlib.jar kotlin-reflect.jar kotlin-test.jar kotlin-stdli
- b-jdk7.jar kotlin-stdlib-jdk8.jar sqlite-jdbc-3.27.2.jar okhttp-3.14.
- 0.jar okio-1.17.2.jar imgscalr-lib-4.2.jar swingx-all-1.6.5-1.jar
+Class-Path: jsoup-1.12.1.jar swingx-all-1.6.5-1.jar imgscalr-lib-4.2.j
+ ar guava-27.1-jre.jar failureaccess-1.0.1.jar listenablefuture-9999.0
+ -empty-to-avoid-conflict-with-guava.jar jsr305-3.0.2.jar checker-qual
+ -2.5.2.jar error_prone_annotations-2.2.0.jar j2objc-annotations-1.1.j
+ ar animal-sniffer-annotations-1.17.jar metrics-core-3.1.2.jar slf4j-a
+ pi-1.7.7.jar weblaf-ui-1.2.10.jar weblaf-core-1.2.10.jar xstream-1.4.
+ 9.jar jericho-html-3.3.jar java-image-scaling-0.8.6.jar filters-2.0.2
+ 35.jar slf4j-api-1.7.27.jar svg-salamander-1.0.jar rsyntaxtextarea-2.
+ 6.0.jar sqlite-jdbc-3.27.2.jar kotlin-stdlib.jar kotlin-reflect.jar k
+ otlin-test.jar kotlin-stdlib-jdk7.jar kotlin-stdlib-jdk8.jar okhttp-3
+ .14.0.jar okio-1.17.2.jar commons-lang3-3.9.jar commons-collections4-
+ 4.4.jar leveldb-0.12.jar leveldb-api-0.12.jar guava-21.0.jar
 Main-Class: cc.joyreactor.JRViewer
 
