@@ -1,7 +1,7 @@
 package cc.joyreactor.views;
 
 import cc.joyreactor.data.Tag;
-import org.jdesktop.swingx.WrapLayout;
+import com.alee.extended.layout.VerticalFlowLayout;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +15,7 @@ public class JFilterView extends JPanel implements MouseListener {
     private final List<Tag> filterTags;
 
     public JFilterView(List<Tag> filterTags) {
-        super(new WrapLayout());
+        super(new VerticalFlowLayout());
         this.filterTags = filterTags;
     }
 

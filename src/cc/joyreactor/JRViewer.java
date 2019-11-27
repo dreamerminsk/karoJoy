@@ -33,11 +33,12 @@ public class JRViewer extends WebFrame implements PropertyChangeListener {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         try {
-            setupUi();
             updater.set(new Updater(stats));
+            setupUi();
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            System.out.println(e.getMessage());
             NotificationManager.showNotification(e.getMessage());
         }
         setVisible(true);

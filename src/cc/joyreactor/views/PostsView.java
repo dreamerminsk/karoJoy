@@ -148,7 +148,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         c.insets = new Insets(5, 5, 5, 5);
         //c.weighty = 1.0;
         //c.weightx = 1.0;
-        c.fill = GridBagConstraints.HORIZONTAL;
+        c.fill = GridBagConstraints.BOTH;
         comp.add(tagsPanel, c);
 
         imagesPanel = new JPanel(new BorderLayout());
@@ -163,7 +163,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         c.insets = new Insets(5, 5, 5, 5);
         c.weighty = 1.0;
         c.weightx = 2.0;
-        c.fill = GridBagConstraints.BOTH;
+        c.fill = GridBagConstraints.HORIZONTAL;
         comp.add(imagesPanel, c);
 
         tagStats = new JFilterView(filterTags);
@@ -217,7 +217,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
                             jLabel.setVerticalTextPosition(JLabel.TOP);
                             jLabel.setFont(jLabel.getFont().deriveFont(14.0f));
                             jLabel.setBorder(UIManager.getBorder("ScrollPane.border"));
-                            BufferedImage bi = new BufferedImage(512, 512, TYPE_INT_ARGB);
+                            BufferedImage bi = new BufferedImage(368, 368, TYPE_INT_ARGB);
                             jLabel.setIcon(new ImageIcon(bi));
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
@@ -250,7 +250,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
                 Scalr.resize(bufferedImage,
                         Scalr.Method.ULTRA_QUALITY,
                         Scalr.Mode.AUTOMATIC,
-                        512, 512));
+                        368, 368));
     }
 
     private void updateImage(JLabel userLabel, BufferedImage img) {
