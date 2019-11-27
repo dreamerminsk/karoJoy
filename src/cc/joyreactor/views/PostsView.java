@@ -5,7 +5,7 @@ import cc.joyreactor.data.Post;
 import cc.joyreactor.data.Tag;
 import cc.joyreactor.events.TagListener;
 import cc.joyreactor.models.PostsModel;
-import com.alee.extended.image.WebImageGallery;
+import example.WebImageGallery;
 import com.alee.laf.scroll.WebScrollPane;
 import org.imgscalr.Scalr;
 
@@ -53,7 +53,6 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
     private JFilterView tagStats;
     private JPanel imagesMenu;
     private JPanel crPanel;
-    private Map<String, JLabel> refImages = new TreeMap<>();
     private WebImageGallery gallery;
 
     public PostsView(PostsModel model) throws SQLException, IOException {
@@ -185,7 +184,8 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         pubLabel.setDt(current.getPublished().toLocalDateTime());
         ratingLabel.setText(current.getRating().toString() + " ");
         commentsLabel.setText(current.getComments().toString() + " ");
-        gallery.getImages().forEach(img -> gallery.removeImage(img));
+        gallery.getImages().forEach(img ->
+                SwingUtilities.invokeLater(() -> gallery.removeImage(img)));
 
         CompletableFuture.supplyAsync(() -> {
             try {
@@ -206,13 +206,13 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
                             SwingUtilities.invokeLater(() ->
                             {
                                 gallery.addImage(new ImageIcon(pic));
-                                imagesPanel.revalidate();
-                                imagesPanel.repaint();
+                                gallery.revalidate();
+                                gallery.repaint();
                             });
                         }
                     }));
 
-                }).thenRunAsync(() -> SwingUtilities.invokeLater(() -> imagesBox.revalidate()), ES);
+                }).thenRunAsync(() -> SwingUtilities.invokeLater(() -> gallery.revalidate()), ES);
     }
 
     private CompletableFuture<BufferedImage> loadImage(String ref) {

@@ -7,6 +7,7 @@ import cc.joyreactor.views.UpdaterView;
 import com.alee.laf.WebLookAndFeel;
 import com.alee.laf.window.WebFrame;
 import com.alee.managers.notification.NotificationManager;
+import com.alee.skin.dark.DarkSkin;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,6 +50,7 @@ public class JRViewer extends WebFrame implements PropertyChangeListener {
         SwingUtilities.invokeLater(() -> {
             WebLookAndFeel.install();
             JRViewer jrViewer = new JRViewer();
+            jrViewer.setSkin(new DarkSkin());
         });
     }
 
