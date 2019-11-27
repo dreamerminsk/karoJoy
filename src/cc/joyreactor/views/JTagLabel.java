@@ -2,30 +2,35 @@ package cc.joyreactor.views;
 
 import cc.joyreactor.data.Tag;
 import cc.joyreactor.events.TagListener;
+import com.alee.extended.label.WebStyledLabel;
+import com.alee.managers.style.StyleId;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JTagLabel extends JLabel implements MouseListener {
+public class JTagLabel extends WebStyledLabel implements MouseListener {
 
     private List<TagListener> listeners = new ArrayList<>();
 
     private Tag tag;
 
     public JTagLabel(Tag tag) {
-        super();
+        super(StyleId.styledlabelTag);
         this.tag = tag;
         initUI();
     }
 
     private void initUI() {
-        setText(" " + tag.getTag() + " ");
+        setText(tag.getTag() + " ");
         setFont(getFont().deriveFont(Font.ITALIC, 16.0f));
-        setBorder(UIManager.getBorder("ScrollPane.border"));
         addMouseListener(this);
     }
 
@@ -36,7 +41,18 @@ public class JTagLabel extends JLabel implements MouseListener {
 
     private void update() {
         SwingUtilities.invokeLater(() -> {
-            setText(" " + tag.getTag() + " ");
+            setText(tag.getTag() + " ");
+            BufferedImage icon = null;
+            try {
+                if (tag.getAvatar() != null) {
+                    icon = ImageIO.read(new ByteArrayInputStream(tag.getAvatar()));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (tag.getAvatar() != null) {
+                setIcon(new ImageIcon(icon));
+            }
             revalidate();
             repaint();
         });

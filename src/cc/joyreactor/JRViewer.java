@@ -5,6 +5,8 @@ import cc.joyreactor.models.UpdateStats;
 import cc.joyreactor.views.PostsView;
 import cc.joyreactor.views.UpdaterView;
 import com.alee.laf.WebLookAndFeel;
+import com.alee.laf.window.WebFrame;
+import com.alee.managers.notification.NotificationManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,37 +15,39 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class JRViewer extends JFrame implements PropertyChangeListener {
+public class JRViewer extends WebFrame implements PropertyChangeListener {
 
     private static final String TITLE = "karoJoy";
 
-    private static final String VERSION = "v2019-11-20";
+    private static final String VERSION = "v2019-11-27";
 
     private final UpdateStats stats = new UpdateStats();
 
-    private final Updater updater = new Updater(stats);
+    private final ThreadLocal<Updater> updater = new ThreadLocal<>();
 
 
-
-    private JRViewer() throws SQLException, IOException {
+    private JRViewer() {
         super(TITLE + " " + VERSION);
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         setSize(new Dimension(screen.width * 9 / 10, screen.height * 9 / 10));
         setLocationRelativeTo(null);
-        //setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setupUi();
+        try {
+            setupUi();
+            updater.set(new Updater(stats));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            NotificationManager.showNotification(e.getMessage());
+        }
         setVisible(true);
+
     }
 
     public static void main(String... args) {
         SwingUtilities.invokeLater(() -> {
             WebLookAndFeel.install();
-            try {
-                JRViewer jrViewer = new JRViewer();
-            } catch (SQLException | IOException e) {
-                e.printStackTrace();
-            }
+            JRViewer jrViewer = new JRViewer();
         });
     }
 
@@ -58,7 +62,7 @@ public class JRViewer extends JFrame implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("start")) {
             if ((boolean) evt.getNewValue()) {
-                updater.execute();
+                updater.get().execute();
             }
         }
     }

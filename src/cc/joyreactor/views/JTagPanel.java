@@ -2,6 +2,9 @@ package cc.joyreactor.views;
 
 import cc.joyreactor.data.Tag;
 import cc.joyreactor.events.TagListener;
+import com.alee.extended.layout.CompactFlowLayout;
+import com.alee.laf.panel.WebPanel;
+import com.alee.managers.style.StyleId;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,14 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class JTagPanel extends JPanel implements TagListener {
+public class JTagPanel extends WebPanel implements TagListener {
 
     private List<TagListener> listeners = new ArrayList<>();
 
     public JTagPanel(List<Tag> tags) {
-        super(new FlowLayout(FlowLayout.LEFT));
+        super(StyleId.panelDecorated, new CompactFlowLayout(FlowLayout.CENTER, 8, 4));
         update(tags);
-        setBorder(UIManager.getBorder("ScrollPane.border"));
+        setPadding(5);
     }
 
     public void setTags(List<Tag> tags) {
