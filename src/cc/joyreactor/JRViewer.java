@@ -4,6 +4,7 @@ import cc.joyreactor.models.PostsModel;
 import cc.joyreactor.models.UpdateStats;
 import cc.joyreactor.views.PostsView;
 import cc.joyreactor.views.UpdaterView;
+import com.alee.laf.WebLookAndFeel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,14 +36,15 @@ public class JRViewer extends JFrame implements PropertyChangeListener {
         setVisible(true);
     }
 
-    public static void main(String... args) throws SQLException, IOException {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            //UIManager.setLookAndFeel(new NimbusLookAndFeel());
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
-        }
-        JRViewer jrViewer = new JRViewer();
+    public static void main(String... args) {
+        SwingUtilities.invokeLater(() -> {
+            WebLookAndFeel.install();
+            try {
+                JRViewer jrViewer = new JRViewer();
+            } catch (SQLException | IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void setupUi() throws SQLException, IOException {

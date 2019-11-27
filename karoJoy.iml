@@ -20,5 +20,6 @@
     <orderEntry type="library" name="org.imgscalr:imgscalr-lib:4.2" level="project" />
     <orderEntry type="library" name="org.apache.commons:commons-lang3:3.9" level="project" />
     <orderEntry type="library" name="org.apache.commons:commons-collections4:4.4" level="project" />
+    <orderEntry type="library" name="com.weblookandfeel:weblaf-ui:1.2.10" level="project" />
   </component>
 </module>
