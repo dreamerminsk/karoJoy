@@ -185,7 +185,7 @@ public class PostsView extends JPanel implements PropertyChangeListener, TagList
         pubLabel.setDt(current.getPublished().toLocalDateTime());
         ratingLabel.setText(current.getRating().toString() + " ");
         commentsLabel.setText(current.getComments().toString() + " ");
-        gallery.removeAll();
+        gallery.getImages().forEach(img -> gallery.removeImage(img));
 
         CompletableFuture.supplyAsync(() -> {
             try {
