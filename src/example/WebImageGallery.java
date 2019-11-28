@@ -392,7 +392,7 @@ public class WebImageGallery extends JComponent
     {
         if ( getParent () instanceof JComponent )
         {
-            ( ( JComponent ) getParent () ).revalidate ();
+            getParent().revalidate();
         }
         repaint ();
     }
