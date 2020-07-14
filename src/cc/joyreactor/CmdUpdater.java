@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
 
 public class CmdUpdater {
 
-    public static final int THREAD_COUNT = 20;
+    public static final int THREAD_COUNT = 1;
     private final static ConcurrentSkipListMap<Instant, String> urlMap = new ConcurrentSkipListMap<>();
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_COUNT);
     private static final ThreadLocalRandom tlr = ThreadLocalRandom.current();
@@ -126,8 +126,6 @@ public class CmdUpdater {
         }
         WebClient.getDocSync(tagRef.getValue()).ifPresent((doc) -> {
             stats.startTask(Thread.currentThread(), tagRef.getKey(), tagRef.getValue(), parseTagString(doc));
-            System.out.println("\t\t\t[" + Thread.currentThread().getName() + "]  NEXT '" + parseTagString(doc) + "' : " + tagRef);
-
             Tag tag = source.getTag(parseTagString(doc));
             if (tag != null) {
                 if (tag.getAvatar() == null) {
@@ -139,19 +137,19 @@ public class CmdUpdater {
                     source.updateTag(tag);
                 }
             }
-
             doc.select("a.next").forEach(next -> urlMap.putIfAbsent(Instant.now(), next.attr("abs:href")));
-
             doc.select("div.postContainer").stream().map(
                     CmdUpdater::parsePost)
                     .peek(stats::processed)
                     .forEachOrdered(CmdUpdater::update);
+            System.out.println("[" + Thread.currentThread().getName() + "]\r\nNEXT '" + parseTagString(doc) + "' : " + tagRef);
             stats.startTask(Thread.currentThread(), Instant.now(), tagRef.getValue(), "[" + parseTagString(doc) + "]");
         });
     }
 
     private static void update(Post post) {
         Post dbPost = source.getPost(post.getId());
+        System.out.println("STATS {");
         if (dbPost == null || dbPost.getUser() == null) {
             System.out.println("\tNEW POSTS: " + stats.incPosts());
             System.out.println("\tNEW COMMENTS: " + stats.addComments(post.getComments()));
@@ -168,6 +166,7 @@ public class CmdUpdater {
         if (source.getPostImages(post.getId()).size() == 0) {
             source.setPostImages(post.getId(), post.getImages());
         }
+        System.out.println("}");
     }
 
     private static String parseTagString(Element post) {
@@ -177,23 +176,22 @@ public class CmdUpdater {
 
     private static Post parsePost(Element post) {
         Post postItem = new Post();
+        System.out.println("POST {");
         postItem.setId(parsePostId(post));
-        System.out.println("\t\t\t" + postItem.getId());
+        System.out.println("\tID: " + postItem.getId());
         postItem.setUser(parseUser(post));
-        System.out.println("\t\t\t" + postItem.getUser().getName());
+        System.out.println("\tUser: " + postItem.getUser().getName());
         postItem.setTags(parseTags(post));
-        System.out.println("\t\t\t" + postItem.getTags());
+        System.out.println("\tTags: " + postItem.getTags());
         postItem.setImages(parseImages(post));
-        System.out.println("\t\t\t" + postItem.getImages());
+        System.out.println("\tImages: " + postItem.getImages());
         postItem.setComments(parseComments(post));
-        System.out.println("\t\t\t" + postItem.getComments());
+        System.out.println("\tComments: " + postItem.getComments());
         postItem.setRating(parseRating(post));
-        System.out.println("\t\t\t" + postItem.getRating());
+        System.out.println("\tRatings: " + postItem.getRating());
         postItem.setPublished(parsePublished(post));
-        System.out.println("\t\t\t" + postItem.getPublished());
-        //System.out.println(postItem.getId() + " " + postItem.getTags());
-        //System.out.println("\t" + postItem.getUser().getName() + " " + postItem.getPublished());
-        //System.out.println("\t" + postItem.getImages().size() + ", " + postItem.getComments() + ", " + postItem.getRating());
+        System.out.println("\tPublished: " + postItem.getPublished());
+        System.out.println("}");
         return postItem;
     }
 
@@ -209,7 +207,7 @@ public class CmdUpdater {
         return post.select("div.uhead_nick").stream()
                 .flatMap(user -> user.select(".avatar").stream()
                         .map(av -> {
-                            System.out.println(av.attr("abs:src"));
+                            System.out.println("\tAvatar: " +av.attr("abs:src"));
                             User dbUser = source.getUser(user.text());
                             if (dbUser == null) {
                                 System.out.println("\tNEW USERS: " + stats.incUsers());
@@ -265,13 +263,11 @@ public class CmdUpdater {
                         tag.attr("title"),
                         tag.attr("abs:href"),
                         tag.attr("data-ids")));
-
                 tags.add(source.getTag(tag.attr("title")));
             } else {
                 tags.add(dbTag);
             }
         });
-
         return tags;
     }
 

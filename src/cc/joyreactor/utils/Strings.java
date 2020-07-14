@@ -1,6 +1,6 @@
 package cc.joyreactor.utils;
 
-import com.sun.istack.internal.NotNull;
+import com.alee.api.annotations.NotNull;
 
 public class Strings {
 

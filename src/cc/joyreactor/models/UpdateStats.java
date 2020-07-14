@@ -187,8 +187,6 @@ public class UpdateStats extends AbstractTableModel {
     public void processed(Post item) {
         try {
             pubTableModel.updateStats(item.getPublished());
-
-
             item.getTags().forEach(t -> tagStats.add(t.getTag()));
             List<Multiset.Entry<String>> tags = tagStats.entrySet().stream()
                     .sorted(Comparator.comparingInt(Multiset.Entry::getCount)).collect(Collectors.toList());
@@ -200,7 +198,6 @@ public class UpdateStats extends AbstractTableModel {
                     }
                 }
             }
-
         } catch (Exception e) {
             JXErrorPane.showDialog(e);
         }

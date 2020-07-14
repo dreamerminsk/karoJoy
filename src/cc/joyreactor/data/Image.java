@@ -37,4 +37,8 @@ public class Image {
     public void setRef(String ref) {
         this.ref = ref;
     }
+
+    public String toString() {
+        return width + "x" + height;
+    }
 }

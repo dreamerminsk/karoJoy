@@ -183,10 +183,8 @@ public class Source {
             }
         } catch (SQLException ex) {
             JXErrorPane.showFrame(ex);
-            System.out.println(tags);
             return tags;
         }
-        System.out.println(tags);
         return tags;
     }
 
@@ -223,10 +221,8 @@ public class Source {
             }
         } catch (SQLException e) {
             JXErrorPane.showFrame(e);
-            System.out.println(images);
             return images;
         }
-        System.out.println(images);
         return images;
     }
 
