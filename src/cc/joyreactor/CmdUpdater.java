@@ -43,10 +43,6 @@ public class CmdUpdater {
         urlMap.put(Instant.now().minusSeconds(80), "http://joyreactor.cc/tag/animal+art/new");
         urlMap.put(Instant.now().minusSeconds(90), "http://joyreactor.cc/tag/Pin-Up/new");
         urlMap.put(Instant.now().minusSeconds(100), "http://joyreactor.cc/tag/%D0%BE%D0%B1%D0%BE%D0%B8/new");
-        urlMap.put(Instant.now().minusSeconds(110), "http://joyreactor.cc/tag/Sci-Fi/new");
-        urlMap.put(Instant.now().minusSeconds(120), "http://joyreactor.cc/tag/%D0%9C%D1%80%D0%B0%D1%87%D0%BD%D1%8B%D0%B5+%D0%BA%D0%B0%D1%80%D1%82%D0%B8%D0%BD%D0%BA%D0%B8/new");
-        urlMap.put(Instant.now().minusSeconds(130), "http://joyreactor.cc/tag/Traditional+art/new");
-        urlMap.put(Instant.now().minusSeconds(140), "http://joyreactor.cc/tag/digital+art/new");
         urlMap.put(Instant.now().minusSeconds(150), "http://joyreactor.cc/tag/art/new");
 
         urlMap.put(Instant.now().minusSeconds(160), "http://anime.reactor.cc/new");
@@ -149,7 +145,7 @@ public class CmdUpdater {
 
     private static void update(Post post) {
         Post dbPost = source.getPost(post.getId());
-        System.out.println("STATS {");
+        System.out.println("STATS");
         if (dbPost == null || dbPost.getUser() == null) {
             System.out.println("\tNEW POSTS: " + stats.incPosts());
             System.out.println("\tNEW COMMENTS: " + stats.addComments(post.getComments()));
@@ -166,7 +162,6 @@ public class CmdUpdater {
         if (source.getPostImages(post.getId()).size() == 0) {
             source.setPostImages(post.getId(), post.getImages());
         }
-        System.out.println("}");
     }
 
     private static String parseTagString(Element post) {
@@ -176,7 +171,7 @@ public class CmdUpdater {
 
     private static Post parsePost(Element post) {
         Post postItem = new Post();
-        System.out.println("POST {");
+        System.out.println("POST");
         postItem.setId(parsePostId(post));
         System.out.println("\tID: " + postItem.getId());
         postItem.setUser(parseUser(post));
@@ -191,7 +186,6 @@ public class CmdUpdater {
         System.out.println("\tRatings: " + postItem.getRating());
         postItem.setPublished(parsePublished(post));
         System.out.println("\tPublished: " + postItem.getPublished());
-        System.out.println("}");
         return postItem;
     }
 
