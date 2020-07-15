@@ -56,6 +56,7 @@ public class Source {
             }
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return tags;
         }
         return tags;
@@ -77,6 +78,7 @@ public class Source {
             }
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return tags;
         }
         return tags;
@@ -98,6 +100,7 @@ public class Source {
             }
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return null;
         }
         return null;
@@ -129,7 +132,8 @@ public class Source {
             statement.setBytes(5, tag.getBanner());
             return statement.executeUpdate();
         } catch (SQLException ex) {
-            JXErrorPane.showDialog(ex);
+            //JXErrorPane.showDialog(ex);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return 0;
         }
     }
@@ -148,6 +152,7 @@ public class Source {
             }
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return null;
         }
         return null;
@@ -162,6 +167,7 @@ public class Source {
             return statement.executeUpdate();
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return 0;
         }
     }
@@ -182,7 +188,8 @@ public class Source {
                 }
             }
         } catch (SQLException ex) {
-            JXErrorPane.showFrame(ex);
+            //JXErrorPane.showFrame(ex);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return tags;
         }
         return tags;
@@ -202,6 +209,7 @@ public class Source {
             });
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             //return null;
         }
     }
@@ -220,7 +228,8 @@ public class Source {
                 }
             }
         } catch (SQLException e) {
-            JXErrorPane.showFrame(e);
+            //JXErrorPane.showFrame(e);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return images;
         }
         return images;
@@ -242,6 +251,7 @@ public class Source {
             });
         } catch (SQLException ex) {
             //JXErrorPane.showDialog(ex);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             //return null;
         }
     }
@@ -255,7 +265,8 @@ public class Source {
             if (post != null) return post;
         } catch (SQLException e) {
             ErrorInfo ii = new ErrorInfo("getPost( " + postId + " )", e.getMessage(), null, null, e, null, null);
-            JXErrorPane.showDialog(null, ii);
+            //JXErrorPane.showDialog(null, ii);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return null;
         }
         return null;
@@ -283,7 +294,8 @@ public class Source {
             Post post = recordToPost(statement);
             if (post != null) return post;
         } catch (SQLException e) {
-            JXErrorPane.showDialog(e);
+            //JXErrorPane.showDialog(e);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return null;
         }
         return null;
@@ -311,7 +323,8 @@ public class Source {
             Post post = recordToPost(statement);
             if (post != null) return post;
         } catch (SQLException e) {
-            JXErrorPane.showDialog(e);
+            //JXErrorPane.showDialog(e);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return null;
         }
         return null;
@@ -342,7 +355,8 @@ public class Source {
             return statement.executeUpdate();
         } catch (SQLException ex) {
             ErrorInfo ii = new ErrorInfo("getPost( " + post.getId() + " )", ex.getMessage(), null, null, ex, null, null);
-            JXErrorPane.showDialog(null, ii);
+            //JXErrorPane.showDialog(null, ii);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
         }
         return 0;
     }
@@ -355,7 +369,8 @@ public class Source {
             statement.setInt(3, post.getId());
             return statement.executeUpdate();
         } catch (SQLException ex) {
-            JXErrorPane.showDialog(ex);
+            //JXErrorPane.showDialog(ex);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
         }
         return 0;
     }
@@ -370,7 +385,8 @@ public class Source {
                 }
             }
         } catch (SQLException e) {
-            JXErrorPane.showFrame(e);
+            //JXErrorPane.showFrame(e);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return tags;
         }
         return tags;
@@ -386,7 +402,8 @@ public class Source {
                 }
             }
         } catch (SQLException e) {
-            JXErrorPane.showFrame(e);
+            //JXErrorPane.showFrame(e);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return tags;
         }
         return tags;
@@ -402,7 +419,8 @@ public class Source {
                 }
             }
         } catch (SQLException e) {
-            JXErrorPane.showFrame(e);
+            //JXErrorPane.showFrame(e);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return tags;
         }
         return tags;
@@ -418,7 +436,8 @@ public class Source {
                 }
             }
         } catch (SQLException e) {
-            JXErrorPane.showFrame(e);
+            //JXErrorPane.showFrame(e);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return tags;
         }
         return tags;
@@ -434,7 +453,8 @@ public class Source {
                 }
             }
         } catch (SQLException e) {
-            JXErrorPane.showFrame(e);
+            //JXErrorPane.showFrame(e);
+            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
             return tags;
         }
         return tags;
