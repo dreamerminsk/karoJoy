@@ -34,10 +34,11 @@ import static cc.joyreactor.Updater.THREAD_COUNT;
 
 public class UpdateStats extends AbstractTableModel {
 
-    private final AtomicLong newUsers = new AtomicLong(0);
-    private final AtomicLong newPosts = new AtomicLong(0);
-    private final AtomicLong newComments = new AtomicLong(0);
-    private final AtomicReference<BigDecimal> newRating = new AtomicReference<>(new BigDecimal(0));
+    public final AtomicLong newUsers = new AtomicLong(0);
+    public final AtomicLong newPosts = new AtomicLong(0);
+    public final AtomicLong newComments = new AtomicLong(0);
+    public final AtomicReference<BigDecimal> newRating = new AtomicReference<>(new BigDecimal(0));
+
     private ScheduledExecutorService SES = Executors.newScheduledThreadPool(1);
     private PropertyChangeSupport changes = new PropertyChangeSupport(this);
 

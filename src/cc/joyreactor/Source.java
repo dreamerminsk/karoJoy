@@ -229,7 +229,7 @@ public class Source {
             }
         } catch (SQLException e) {
             //JXErrorPane.showFrame(e);
-            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
+            System.out.println(e.getClass().getName() + " - " + e.getMessage());
             return images;
         }
         return images;
@@ -266,7 +266,7 @@ public class Source {
         } catch (SQLException e) {
             ErrorInfo ii = new ErrorInfo("getPost( " + postId + " )", e.getMessage(), null, null, e, null, null);
             //JXErrorPane.showDialog(null, ii);
-            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
+            System.out.println(e.getClass().getName() + " - " + e.getMessage());
             return null;
         }
         return null;
@@ -295,7 +295,7 @@ public class Source {
             if (post != null) return post;
         } catch (SQLException e) {
             //JXErrorPane.showDialog(e);
-            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
+            System.out.println(e.getClass().getName() + " - " + e.getMessage());
             return null;
         }
         return null;
@@ -324,7 +324,7 @@ public class Source {
             if (post != null) return post;
         } catch (SQLException e) {
             //JXErrorPane.showDialog(e);
-            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
+            System.out.println(e.getClass().getName() + " - " + e.getMessage());
             return null;
         }
         return null;
@@ -386,7 +386,7 @@ public class Source {
             }
         } catch (SQLException e) {
             //JXErrorPane.showFrame(e);
-            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
+            System.out.println(e.getClass().getName() + " - " + e.getMessage());
             return tags;
         }
         return tags;
@@ -403,7 +403,7 @@ public class Source {
             }
         } catch (SQLException e) {
             //JXErrorPane.showFrame(e);
-            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
+            System.out.println(e.getClass().getName() + " - " + e.getMessage());
             return tags;
         }
         return tags;
@@ -420,7 +420,7 @@ public class Source {
             }
         } catch (SQLException e) {
             //JXErrorPane.showFrame(e);
-            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
+            System.out.println(e.getClass().getName() + " - " + e.getMessage());
             return tags;
         }
         return tags;
@@ -437,7 +437,7 @@ public class Source {
             }
         } catch (SQLException e) {
             //JXErrorPane.showFrame(e);
-            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
+            System.out.println(e.getClass().getName() + " - " + e.getMessage());
             return tags;
         }
         return tags;
@@ -454,7 +454,7 @@ public class Source {
             }
         } catch (SQLException e) {
             //JXErrorPane.showFrame(e);
-            System.out.println(ex.getClass().getName() + " - " + ex.getMessage());
+            System.out.println(e.getClass().getName() + " - " + e.getMessage());
             return tags;
         }
         return tags;
