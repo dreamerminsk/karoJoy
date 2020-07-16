@@ -41,7 +41,7 @@ public class CmdUpdater {
         urlMap.put(Instant.now().minusSeconds(70), "http://joyreactor.cc/tag/art/new");
         urlMap.put(Instant.now().minusSeconds(80), "http://anime.reactor.cc/new");
         urlMap.put(Instant.now().minusSeconds(90), "http://pr.reactor.cc/new");
-        urlMap.put(Instant.now().minusSeconds(100), "http://joyreactor.cc/all");
+        urlMap.put(Instant.now().minusSeconds(5), "http://joyreactor.cc/all");
 
         scheduler.scheduleWithFixedDelay(() -> {
             List<Tag> tags = source.getTags();
