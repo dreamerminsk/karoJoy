@@ -4,7 +4,6 @@ import cc.joyreactor.data.Image;
 import cc.joyreactor.data.Post;
 import cc.joyreactor.data.Tag;
 import cc.joyreactor.data.User;
-import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.sqlite.JDBC;
 import org.sqlite.util.StringUtils;
@@ -42,7 +41,7 @@ public class Source {
 
     public List<Tag> getTags() {
         List<Tag> tags = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM jr_tags 256;")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM jr_tags LIMIT 256;")) {
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     tags.add(new Tag(
