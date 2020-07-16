@@ -10,9 +10,7 @@ import org.jsoup.nodes.Element;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +27,7 @@ public class CmdUpdater {
     private static final ThreadLocalRandom tlr = ThreadLocalRandom.current();
     private static Source source;
     private static UpdateStats stats;
+    private static LocalDateTime start = LocalDateTime.now();
 
     public CmdUpdater(UpdateStats stats) throws SQLException {
         CmdUpdater.stats = stats;
@@ -98,7 +97,8 @@ public class CmdUpdater {
 
     private static void update(Post post) {
         Post dbPost = source.getPost(post.getId());
-        System.out.println("STATS");
+        Duration duration = Duration.between(LocalDateTime.now(), start);
+        System.out.println("STATS / " + duration.toString());
         if (dbPost == null || dbPost.getUser() == null) {
             System.out.println("\tNEW USERS: " + stats.newUsers.get());
             System.out.println("\tNEW POSTS: " + stats.incPosts());
